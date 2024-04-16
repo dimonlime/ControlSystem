@@ -155,6 +155,90 @@ async def insert_image_cheque(message: Message, state: FSMContext):
 """-----------------------------------------------------------------------------------------------------------------"""
 
 
+@router.message(F.text == 'Проверить чеки')
+async def edit_order_status(message: Message, state: FSMContext):
+    await message.answer('Выберите категорию чека:', reply_markup=kb.cheques_category_2)
+
+
+@router.callback_query(F.data == 'paid_cheques')
+async def get_unpaid_cheques(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await callback.message.answer('Список оплаченных чеков', reply_markup=await kb.inline_paid_cheques())
+
+
+@router.callback_query(F.data == 'unpaid_cheques')
+async def get_unpaid_cheques(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await callback.message.answer('Список не оплаченных чеков', reply_markup=await kb.inline_unpaid_cheques())
+
+
+@router.callback_query(F.data.startswith('view_cheque_'))
+async def insert_date_cheque(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await state.set_state(change_cheque_status.select_cheque)
+    cheque_id = str(callback.data)[12:]
+    cheque = await rq.get_cheque(cheque_id)
+    order = await rq.get_order(cheque.order_id)
+    await state.update_data(order_id=cheque.order_id, cheque_id=cheque.id)
+    if cheque.payment_image is None:
+        await callback.message.answer_photo(caption=f'Id заказа {str(order.id)}\n'
+                                                    f'Дата заказа {str(order.date)}\n'
+                                                    f'Внутренний артикул {str(order.internal_article)}\n'
+                                                    f'Кол-во товара размера S {str(order.S)}\n'
+                                                    f'Кол-во товара размера M {str(order.M)}\n'
+                                                    f'Кол-во товара размера L {str(order.L)}\n'
+                                                    f'Название магазина {str(order.vendor_name)}\n'
+                                                    f'Способ отправки {str(order.sending_method)}\n'
+                                                    f'Статус заказа {str(order.order_status)}\n',
+                                            photo=order.order_image_id)
+        await callback.message.answer_photo(caption=f'ID чека {str(cheque.id)}\n'
+                                                    f'Дата чека {str(cheque.date)}\n'
+                                                    f'Название магазина {str(cheque.vendor_name)}\n'
+                                                    f'Цена {str(cheque.price)}\n'
+                                                    f'Статус чека {str(cheque.cheque_status)}\n',
+                                            photo=cheque.cheque_image_id)
+    elif order.fish is not None and cheque.payment_image is not None:
+        await callback.message.answer_photo(caption=f'Id заказа {str(order.id)}\n'
+                                                    f'Дата заказа {str(order.date)}\n'
+                                                    f'Внутренний артикул {str(order.internal_article)}\n'
+                                                    f'Кол-во товара размера S {str(order.S)}\n'
+                                                    f'Кол-во товара размера M {str(order.M)}\n'
+                                                    f'Кол-во товара размера L {str(order.L)}\n'
+                                                    f'Название магазина {str(order.vendor_name)}\n'
+                                                    f'Способ отправки {str(order.sending_method)}\n'
+                                                    f'Статус заказа {str(order.order_status)}\n'
+                                                    f'FISH номер заказа {str(order.fish)}\n',
+                                            photo=order.order_image_id)
+        await callback.message.answer_photo(caption=f'ID чека {str(cheque.id)}\n'
+                                                    f'Дата чека {str(cheque.date)}\n'
+                                                    f'Название магазина {str(cheque.vendor_name)}\n'
+                                                    f'Цена {str(cheque.price)}\n'
+                                                    f'Статус чека {str(cheque.cheque_status)}\n',
+                                            photo=cheque.cheque_image_id)
+        await callback.message.answer_photo(caption='Скрин оплаты', photo=cheque.payment_image)
+    elif cheque.payment_image is not None:
+        await callback.message.answer_photo(caption=f'Id заказа {str(order.id)}\n'
+                                                    f'Дата заказа {str(order.date)}\n'
+                                                    f'Внутренний артикул {str(order.internal_article)}\n'
+                                                    f'Кол-во товара размера S {str(order.S)}\n'
+                                                    f'Кол-во товара размера M {str(order.M)}\n'
+                                                    f'Кол-во товара размера L {str(order.L)}\n'
+                                                    f'Название магазина {str(order.vendor_name)}\n'
+                                                    f'Способ отправки {str(order.sending_method)}\n'
+                                                    f'Статус заказа {str(order.order_status)}\n',
+                                            photo=order.order_image_id)
+        await callback.message.answer_photo(caption=f'ID чека {str(cheque.id)}\n'
+                                                    f'Дата чека {str(cheque.date)}\n'
+                                                    f'Название магазина {str(cheque.vendor_name)}\n'
+                                                    f'Цена {str(cheque.price)}\n'
+                                                    f'Статус чека {str(cheque.cheque_status)}\n',
+                                            photo=cheque.cheque_image_id)
+        await callback.message.answer_photo(caption='Скрин оплаты', photo=cheque.payment_image)
+
+
+"""-----------------------------------------------------------------------------------------------------------------"""
+
+
 @router.message(F.text == 'Создать заказ')
 async def create_cheque(message: Message, state: FSMContext):
     if message.from_user.id in senders:
@@ -254,6 +338,18 @@ async def get_all_cheques(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer('Список всех чеков', reply_markup=await kb.inline_all_cheques())
 
 
+@router.callback_query(F.data == 'delay_cheques')
+async def get_delay_cheques(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await callback.message.answer('Список чеков с отсрочкой', reply_markup=await kb.inline_delay_cheques())
+
+
+@router.callback_query(F.data == 'fire_cheques')
+async def get_fire_cheques(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await callback.message.answer('Список горящих чеков', reply_markup=await kb.inline_fire_cheques())
+
+
 @router.callback_query(F.data.startswith('pay_cheque_'))
 async def insert_date_cheque(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
@@ -279,6 +375,25 @@ async def insert_date_cheque(callback: CallbackQuery, state: FSMContext):
                                                     f'Цена {str(cheque.price)}\n'
                                                     f'Статус чека {str(cheque.cheque_status)}\n',
                                             photo=cheque.cheque_image_id, reply_markup=kb.select_cheque)
+    elif order.order_status == 'Передан в логистику' and cheque.payment_image is not None:
+        await callback.message.answer_photo(caption=f'Id заказа {str(order.id)}\n'
+                                                    f'Дата заказа {str(order.date)}\n'
+                                                    f'Внутренний артикул {str(order.internal_article)}\n'
+                                                    f'Кол-во товара размера S {str(order.S)}\n'
+                                                    f'Кол-во товара размера M {str(order.M)}\n'
+                                                    f'Кол-во товара размера L {str(order.L)}\n'
+                                                    f'Название магазина {str(order.vendor_name)}\n'
+                                                    f'Способ отправки {str(order.sending_method)}\n'
+                                                    f'Статус заказа {str(order.order_status)}\n'
+                                                    f'FISH номер заказа {str(order.fish)}\n',
+                                            photo=order.order_image_id)
+        await callback.message.answer_photo(caption=f'ID чека {str(cheque.id)}\n'
+                                                    f'Дата чека {str(cheque.date)}\n'
+                                                    f'Название магазина {str(cheque.vendor_name)}\n'
+                                                    f'Цена {str(cheque.price)}\n'
+                                                    f'Статус чека {str(cheque.cheque_status)}\n',
+                                            photo=cheque.cheque_image_id)
+        await callback.message.answer_photo(caption='Скрин оплаты', photo=cheque.payment_image)
     elif cheque.payment_image is not None:
         await callback.message.answer_photo(caption=f'Id заказа {str(order.id)}\n'
                                                     f'Дата заказа {str(order.date)}\n'

@@ -59,6 +59,12 @@ async def all_cheques():
         return cheques
 
 
+async def delay_cheques():
+    async with async_session() as session:
+        cheques = await session.scalars(select(Cheque).where(Cheque.cheque_status == 'По чеку имеется отсрочка'))
+        return cheques
+
+
 async def set_payment_image(cheque_id, payment_image_id):
     async with async_session() as session:
         cheque = await session.scalar(select(Cheque).where(Cheque.id == cheque_id))

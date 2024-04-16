@@ -1,11 +1,14 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
+from datetime import datetime, timedelta
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from app import id_config
 from app.database import requests as rq
 import json
 
 recipient_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='Изменить статус заказа')]
+    [KeyboardButton(text='Изменить статус заказа')],
+    [KeyboardButton(text='Проверить чеки')]
+
 ], resize_keyboard=True)
 
 sender_keyboard = ReplyKeyboardMarkup(keyboard=[
@@ -20,7 +23,12 @@ test = InlineKeyboardMarkup(inline_keyboard=[
 cheques_category = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Все чеки', callback_data='all_chques')],
     [InlineKeyboardButton(text='Чеки с отсрочкой', callback_data='delay_cheques')],
-    [InlineKeyboardButton(text='Горящие чеки', callback_data='fire_chques')]
+    [InlineKeyboardButton(text='Горящие чеки', callback_data='fire_cheques')]
+])
+
+cheques_category_2 = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='Не оплаченные чеки', callback_data='unpaid_cheques')],
+    [InlineKeyboardButton(text='Оплаченные чеки', callback_data='paid_cheques')]
 ])
 
 select_cheque = InlineKeyboardMarkup(inline_keyboard=[
@@ -57,6 +65,48 @@ async def inline_all_cheques():
     for cheque in data:
         keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
                                           callback_data=f'pay_cheque_{cheque.id}'))
+    return keyboard.adjust(1).as_markup()
+
+
+async def inline_delay_cheques():
+    keyboard = InlineKeyboardBuilder()
+    data = await rq.delay_cheques()
+    for cheque in data:
+        keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
+                                          callback_data=f'pay_cheque_{cheque.id}'))
+    return keyboard.adjust(1).as_markup()
+
+
+async def inline_fire_cheques():
+    keyboard = InlineKeyboardBuilder()
+    data = await rq.all_cheques()
+    for cheque in data:
+        cheque_date = datetime.strptime(cheque.date, "%Y-%m-%d %H:%M:%S")
+        if (datetime.now() - cheque_date) >= timedelta(days=14) and (cheque.cheque_status == 'По чеку имеется отсрочка'
+                                                                    or cheque.cheque_status == 'Чек не оплачен по истечению 2 недель'):
+            await rq.set_cheque_status(cheque.id, 'Чек не оплачен по истечению 2 недель')
+            keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
+                                              callback_data=f'pay_cheque_{cheque.id}'))
+    return keyboard.adjust(1).as_markup()
+
+
+async def inline_unpaid_cheques():
+    keyboard = InlineKeyboardBuilder()
+    data = await rq.all_cheques()
+    for cheque in data:
+        if cheque.cheque_status == 'По чеку имеется отсрочка' or cheque.cheque_status == 'Чек не оплачен по истечению 2 недель':
+            keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
+                                              callback_data=f'view_cheque_{cheque.id}'))
+    return keyboard.adjust(1).as_markup()
+
+
+async def inline_paid_cheques():
+    keyboard = InlineKeyboardBuilder()
+    data = await rq.all_cheques()
+    for cheque in data:
+        if cheque.cheque_status == 'Чек оплачен':
+            keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
+                                              callback_data=f'view_cheque_{cheque.id}'))
     return keyboard.adjust(1).as_markup()
 
 
