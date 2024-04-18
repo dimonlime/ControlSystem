@@ -13,7 +13,8 @@ recipient_keyboard = ReplyKeyboardMarkup(keyboard=[
 
 sender_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Создать заказ')],
-    [KeyboardButton(text='Просмотреть чеки')]
+    [KeyboardButton(text='Просмотреть чеки')],
+    [KeyboardButton(text='Посмотреть заказы')]
 ], resize_keyboard=True)
 
 test = InlineKeyboardMarkup(inline_keyboard=[
@@ -54,8 +55,12 @@ async def inline_all_orders():
     keyboard = InlineKeyboardBuilder()
     data = await rq.all_orders()
     for order in data:
-        keyboard.add(InlineKeyboardButton(text=f'Id заказа: "{order.id}"; Статус заказа: "{order.order_status}"',
-                                          callback_data=f'edit_status_{order.id}'))
+        today_date = datetime.now()
+        half_year = today_date - timedelta(days=365 / 2)
+        order_date = datetime.strptime(order.date, "%Y-%m-%d %H:%M:%S")
+        if half_year <= order_date <= today_date:
+            keyboard.add(InlineKeyboardButton(text=f'Дата: "{order.date}"; Арт: "{order.internal_article}"',
+                                              callback_data=f'edit_status_{order.id}'))
     return keyboard.adjust(1).as_markup()
 
 
@@ -63,8 +68,12 @@ async def inline_all_cheques():
     keyboard = InlineKeyboardBuilder()
     data = await rq.all_cheques()
     for cheque in data:
-        keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
-                                          callback_data=f'pay_cheque_{cheque.id}'))
+        today_date = datetime.now()
+        half_year = today_date - timedelta(days=365 / 2)
+        cheque_date = datetime.strptime(cheque.cheque_date, "%Y-%m-%d %H:%M:%S")
+        if half_year <= cheque_date <= today_date:
+            keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
+                                              callback_data=f'pay_cheque_{cheque.id}'))
     return keyboard.adjust(1).as_markup()
 
 
@@ -72,8 +81,12 @@ async def inline_delay_cheques():
     keyboard = InlineKeyboardBuilder()
     data = await rq.delay_cheques()
     for cheque in data:
-        keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
-                                          callback_data=f'pay_cheque_{cheque.id}'))
+        today_date = datetime.now()
+        half_year = today_date - timedelta(days=365/2)
+        cheque_date = datetime.strptime(cheque.cheque_date, "%Y-%m-%d %H:%M:%S")
+        if half_year <= cheque_date <= today_date:
+            keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
+                                              callback_data=f'pay_cheque_{cheque.id}'))
     return keyboard.adjust(1).as_markup()
 
 
@@ -81,12 +94,18 @@ async def inline_fire_cheques():
     keyboard = InlineKeyboardBuilder()
     data = await rq.all_cheques()
     for cheque in data:
-        cheque_date = datetime.strptime(cheque.date, "%Y-%m-%d %H:%M:%S")
-        if (datetime.now() - cheque_date) >= timedelta(days=14) and (cheque.cheque_status == 'По чеку имеется отсрочка'
-                                                                    or cheque.cheque_status == 'Чек не оплачен по истечению 2 недель'):
-            await rq.set_cheque_status(cheque.id, 'Чек не оплачен по истечению 2 недель')
-            keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
-                                              callback_data=f'pay_cheque_{cheque.id}'))
+        cheque_date = datetime.strptime(cheque.cheque_date, "%Y-%m-%d %H:%M:%S")
+        today_date = datetime.now()
+        half_year = today_date - timedelta(days=365 / 2)
+        if half_year <= cheque_date <= today_date:
+            if (datetime.now() - cheque_date) >= timedelta(days=14) and (cheque.cheque_status == 'По чеку имеется отсрочка'
+                                                                         or cheque.cheque_status == 'Чек не оплачен по истечению 2 недель'):
+
+                await rq.set_cheque_status(cheque.id, 'Чек не оплачен по истечению 2 недель',
+                                           datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+                keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
+                                                  callback_data=f'pay_cheque_{cheque.id}'))
     return keyboard.adjust(1).as_markup()
 
 
@@ -94,9 +113,13 @@ async def inline_unpaid_cheques():
     keyboard = InlineKeyboardBuilder()
     data = await rq.all_cheques()
     for cheque in data:
-        if cheque.cheque_status == 'По чеку имеется отсрочка' or cheque.cheque_status == 'Чек не оплачен по истечению 2 недель':
-            keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
-                                              callback_data=f'view_cheque_{cheque.id}'))
+        today_date = datetime.now()
+        half_year = today_date - timedelta(days=365 / 2)
+        cheque_date = datetime.strptime(cheque.cheque_date, "%Y-%m-%d %H:%M:%S")
+        if half_year <= cheque_date <= today_date:
+            if cheque.cheque_status == 'По чеку имеется отсрочка' or cheque.cheque_status == 'Чек не оплачен по истечению 2 недель':
+                keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
+                                                  callback_data=f'view_cheque_{cheque.id}'))
     return keyboard.adjust(1).as_markup()
 
 
@@ -104,16 +127,11 @@ async def inline_paid_cheques():
     keyboard = InlineKeyboardBuilder()
     data = await rq.all_cheques()
     for cheque in data:
-        if cheque.cheque_status == 'Чек оплачен':
-            keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
-                                              callback_data=f'view_cheque_{cheque.id}'))
-    return keyboard.adjust(1).as_markup()
-
-
-async def inline_available_orders():
-    keyboard = InlineKeyboardBuilder()
-    data = await rq.available_orders()
-    for order in data:
-        keyboard.add(InlineKeyboardButton(text=f'Id заказа: {order.id}; Дата заказа {order.date}',
-                                          callback_data=f'{order.id}'))
+        today_date = datetime.now()
+        half_year = today_date - timedelta(days=365 / 2)
+        cheque_date = datetime.strptime(cheque.cheque_date, "%Y-%m-%d %H:%M:%S")
+        if half_year <= cheque_date <= today_date:
+            if cheque.cheque_status == 'Чек оплачен':
+                keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
+                                                  callback_data=f'view_cheque_{cheque.id}'))
     return keyboard.adjust(1).as_markup()
