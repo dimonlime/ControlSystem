@@ -48,6 +48,10 @@ class change_cheque_status(StatesGroup):
     attach_pay_screen = State()
 
 
+class check_orders(StatesGroup):
+    select_order = State()
+
+
 @router.message(CommandStart())
 async def start(message: Message, state: FSMContext):
     if message.from_user.id in senders:
@@ -80,8 +84,9 @@ async def edit_order_status_1(callback: CallbackQuery, state: FSMContext):
     await state.update_data(order_id=order_id)
     order = await rq.get_order(order_id)
     await state.set_state(create_cheque_state.select_status)
-    await callback.message.answer_photo(caption=f'Id заказа {str(order.id)}\n'
+    await callback.message.answer_photo(caption=f'------Данные заказа------\n'
                                                 f'Дата создания заказа {str(order.date)}\n'
+                                                f'Дата последнего изменения заказа {str(order.change_date)}\n'
                                                 f'Внутренний артикул {str(order.internal_article)}\n'
                                                 f'Кол-во товара размера S {str(order.S)}\n'
                                                 f'Кол-во товара размера M {str(order.M)}\n'
@@ -98,22 +103,22 @@ async def edit_order_status_2(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     order_status = str(callback.data)[7:]
     data = await state.get_data()
-    if order_status == 'Готов' and await rq.get_cheque(data['order_id']) is None:
+    if order_status == 'Готов' and await rq.get_cheque_by_orderid(data['order_id']) is None:
         await state.update_data(order_status=order_status)
         await state.set_state(create_cheque_state.insert_date_cheque)
         await callback.message.answer('Внимание, чтобы поменить статус, нужно создать чек')
         await callback.message.answer('Введите дату, указанную на чеке(пример 2021-03-04 15:34):')
     elif (order_status == 'Передан в логистику' and await rq.get_fish(data['order_id']) is None
-          and await rq.get_cheque(data['order_id']) is not None):
+          and await rq.get_cheque_by_orderid(data['order_id']) is not None):
         await state.update_data(order_status=order_status)
         await state.set_state(create_cheque_state.insert_fish)
         await callback.message.answer('Внимание, чтобы поменить статус, нужно приложить FISH')
         await callback.message.answer('Введите номер FISH для данного заказа:')
-
-    elif order_status == 'Передан в работу поставщику' and await rq.get_cheque(data['order_id']) is None:
+    elif order_status == 'Передан в работу поставщику' and await rq.get_cheque_by_orderid(data['order_id']) is None:
         await state.update_data(order_status=order_status)
+        await state.update_data(order_change_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         data = await state.get_data()
-        await rq.edit_order_status(data['order_id'], data['order_status'])
+        await rq.edit_order_status(data['order_id'], data['order_status'], data['order_change_date'])
         await callback.message.answer('Статус успешно обновлен')
     else:
         await callback.message.answer('Нельзя выполнить действие')
@@ -168,11 +173,12 @@ async def insert_price_cheque(message: Message, state: FSMContext):
 async def insert_image_cheque(message: Message, state: FSMContext):
     try:
         await state.update_data(image=message.photo[-1].file_id)
+        await state.update_data(order_change_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         data = await state.get_data()
         order = await rq.get_order(data['order_id'])
         await rq.create_cheque_db(order.vendor_name, data['price'], data['image'], data['order_id'],
                                   data['cheque_date'], data['cheque_number'], data['vendor_article'])
-        await rq.edit_order_status(data['order_id'], data['order_status'])
+        await rq.edit_order_status(data['order_id'], data['order_status'], data['order_change_date'])
         await rq.set_order_cheque_image(data['order_id'], data['image'])
         order = await rq.get_order(data['order_id'])
         await message.answer(f'Чек создан успешно\n'
@@ -237,12 +243,13 @@ async def insert_fish(message: Message, state: FSMContext):
 async def insert_fish(message: Message, state: FSMContext):
     try:
         await state.update_data(fish_image=message.photo[-1].file_id)
+        await state.update_data(order_change_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         data = await state.get_data()
         order = await rq.get_order(data['order_id'])
         await rq.create_fish(data['fish'], data['fish_date'], data['weight'], data['sack_count'], order.sending_method,
-                             data['fish_image'], order.id)
+                             data['fish_image'], data['order_id'])
         await rq.set_order_fish(data['order_id'], data['fish'])
-        await rq.edit_order_status(data['order_id'], data['order_status'])
+        await rq.edit_order_status(data['order_id'], data['order_status'], data['order_change_date'])
         await message.answer('FISH прикрплен')
         await message.answer(f'Статус заказа изменен на {data['order_status']}')
         await state.clear()
@@ -278,13 +285,14 @@ async def insert_date_cheque(callback: CallbackQuery, state: FSMContext):
     cheque_id = str(callback.data)[12:]
     cheque = await rq.get_cheque(cheque_id)
     order = await rq.get_order(cheque.order_id)
-    fish_scalar = await rq.get_fish(order.fish)
+    fish = await rq.get_fish_obj(order.id)
     await state.update_data(order_id=cheque.order_id, cheque_id=cheque.id)
     media_list = []
-    if cheque.payment_image is None:
+    if cheque.payment_image is None and order.fish is None:
         media_list.append(InputMediaPhoto(media=order.order_image_id, caption=
-        f'Id заказа {str(order.id)}\n'
+        f'------Данные заказа------\n'
         f'Дата создания заказа {str(order.date)}\n'
+        f'Дата последнего изменения заказа {str(order.change_date)}\n'
         f'Внутренний артикул {str(order.internal_article)}\n'
         f'Кол-во товара размера S {str(order.S)}\n'
         f'Кол-во товара размера M {str(order.M)}\n'
@@ -292,18 +300,23 @@ async def insert_date_cheque(callback: CallbackQuery, state: FSMContext):
         f'Название магазина {str(order.vendor_name)}\n'
         f'Способ отправки {str(order.sending_method)}\n'
         f'Статус заказа {str(order.order_status)}\n'
-        f'ID чека {str(cheque.id)}\n'
-        f'Дата последнего изменения чека {str(cheque.date)}\n'
+        f'Номер для мешков {str(order.sack_number)}\n'
+        f'------Данные чека------\n'
         f'Дата чека {str(cheque.cheque_date)}\n'
+        f'Дата последнего изменения чека {str(cheque.date)}\n'
         f'Название магазина {str(cheque.vendor_name)}\n'
+        f'Номер чека {str(cheque.cheque_number)}\n'
+        f'Артикул поставщика {str(cheque.vendor_article)}\n'
         f'Цена {str(cheque.price)}\n'
-        f'Статус чека {str(cheque.cheque_status)}\n'))
+        f'Статус чека {str(cheque.cheque_status)}\n'
+                                          ))
         media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
         await callback.message.answer_media_group(media=media_list)
     elif order.fish is not None and cheque.payment_image is not None:
         media_list.append(InputMediaPhoto(media=order.order_image_id, caption=
-        f'Id заказа {str(order.id)}\n'
+        f'------Данные заказа------\n'
         f'Дата создания заказа {str(order.date)}\n'
+        f'Дата последнего изменения заказа {str(order.change_date)}\n'
         f'Внутренний артикул {str(order.internal_article)}\n'
         f'Кол-во товара размера S {str(order.S)}\n'
         f'Кол-во товара размера M {str(order.M)}\n'
@@ -311,21 +324,62 @@ async def insert_date_cheque(callback: CallbackQuery, state: FSMContext):
         f'Название магазина {str(order.vendor_name)}\n'
         f'Способ отправки {str(order.sending_method)}\n'
         f'Статус заказа {str(order.order_status)}\n'
-        f'FISH номер заказа {str(order.fish)}\n'
-        f'ID чека {str(cheque.id)}\n'
-        f'Дата последнего изменения чека {str(cheque.date)}\n'
+        f'Номер для мешков {str(order.sack_number)}\n'
+        f'------Данные чека------\n'
         f'Дата чека {str(cheque.cheque_date)}\n'
+        f'Дата последнего изменения чека {str(cheque.date)}\n'
         f'Название магазина {str(cheque.vendor_name)}\n'
+        f'Номер чека {str(cheque.cheque_number)}\n'
+        f'Артикул поставщика {str(cheque.vendor_article)}\n'
         f'Цена {str(cheque.price)}\n'
-        f'Статус чека {str(cheque.cheque_status)}\n'))
+        f'Статус чека {str(cheque.cheque_status)}\n'
+        f'------Данные fish------\n'
+        f'Номер fish {str(fish.fish)}\n'
+        f'Дата fish {str(fish.date)}\n'
+        f'Вес {str(fish.weight)} кг\n'
+        f'Кол-во мешков {str(fish.sack_count)}\n'
+        f'Способ отправки {str(fish.sending_method)}\n'
+                                          ))
         media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
         media_list.append(InputMediaPhoto(media=cheque.payment_image))
-        media_list.append(InputMediaPhoto(media=fish_scalar.fish_image_id))
+        media_list.append(InputMediaPhoto(media=fish.fish_image_id))
+        await callback.message.answer_media_group(media=media_list)
+    elif order.fish is not None and cheque.payment_image is None:
+        media_list.append(InputMediaPhoto(media=order.order_image_id, caption=
+        f'------Данные заказа------\n'
+        f'Дата создания заказа {str(order.date)}\n'
+        f'Дата последнего изменения заказа {str(order.change_date)}\n'
+        f'Внутренний артикул {str(order.internal_article)}\n'
+        f'Кол-во товара размера S {str(order.S)}\n'
+        f'Кол-во товара размера M {str(order.M)}\n'
+        f'Кол-во товара размера L {str(order.L)}\n'
+        f'Название магазина {str(order.vendor_name)}\n'
+        f'Способ отправки {str(order.sending_method)}\n'
+        f'Статус заказа {str(order.order_status)}\n'
+        f'Номер для мешков {str(order.sack_number)}\n'
+        f'------Данные чека------\n'
+        f'Дата чека {str(cheque.cheque_date)}\n'
+        f'Дата последнего изменения чека {str(cheque.date)}\n'
+        f'Название магазина {str(cheque.vendor_name)}\n'
+        f'Номер чека {str(cheque.cheque_number)}\n'
+        f'Артикул поставщика {str(cheque.vendor_article)}\n'
+        f'Цена {str(cheque.price)}\n'
+        f'Статус чека {str(cheque.cheque_status)}\n'
+        f'------Данные fish------\n'
+        f'Номер fish {str(fish.fish)}\n'
+        f'Дата fish {str(fish.date)}\n'
+        f'Вес {str(fish.weight)} кг\n'
+        f'Кол-во мешков {str(fish.sack_count)}\n'
+        f'Способ отправки {str(fish.sending_method)}\n'
+                                          ))
+        media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
+        media_list.append(InputMediaPhoto(media=fish.fish_image_id))
         await callback.message.answer_media_group(media=media_list)
     elif cheque.payment_image is not None:
         media_list.append(InputMediaPhoto(media=order.order_image_id, caption=
-        f'Id заказа {str(order.id)}\n'
+        f'------Данные заказа------\n'
         f'Дата создания заказа {str(order.date)}\n'
+        f'Дата последнего изменения заказа {str(order.change_date)}\n'
         f'Внутренний артикул {str(order.internal_article)}\n'
         f'Кол-во товара размера S {str(order.S)}\n'
         f'Кол-во товара размера M {str(order.M)}\n'
@@ -333,12 +387,16 @@ async def insert_date_cheque(callback: CallbackQuery, state: FSMContext):
         f'Название магазина {str(order.vendor_name)}\n'
         f'Способ отправки {str(order.sending_method)}\n'
         f'Статус заказа {str(order.order_status)}\n'
-        f'ID чека {str(cheque.id)}\n'
-        f'Дата последнего изменения чека {str(cheque.date)}\n'
+        f'Номер для мешков {str(order.sack_number)}\n'
+        f'------Данные чека------\n'
         f'Дата чека {str(cheque.cheque_date)}\n'
+        f'Дата последнего изменения чека {str(cheque.date)}\n'
         f'Название магазина {str(cheque.vendor_name)}\n'
+        f'Номер чека {str(cheque.cheque_number)}\n'
+        f'Артикул поставщика {str(cheque.vendor_article)}\n'
         f'Цена {str(cheque.price)}\n'
-        f'Статус чека {str(cheque.cheque_status)}\n'))
+        f'Статус чека {str(cheque.cheque_status)}\n'
+                                          ))
         media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
         media_list.append(InputMediaPhoto(media=cheque.payment_image))
         await callback.message.answer_media_group(media=media_list)
@@ -437,6 +495,7 @@ async def insert_date_cheque(message: Message, state: FSMContext):
 @router.message(F.text == 'Просмотреть чеки')
 async def create_cheque(message: Message, state: FSMContext):
     if message.from_user.id in senders:
+        await state.clear()
         await message.answer('Выберите категорию чека:', reply_markup=kb.cheques_category)
 
 
@@ -465,13 +524,14 @@ async def insert_date_cheque(callback: CallbackQuery, state: FSMContext):
     cheque_id = str(callback.data)[11:]
     cheque = await rq.get_cheque(cheque_id)
     order = await rq.get_order(cheque.order_id)
-    fish_scalar = await rq.get_fish(cheque.order_id)
+    fish = await rq.get_fish_obj(cheque.order_id)
     await state.update_data(order_id=cheque.order_id, cheque_id=cheque.id)
     media_list = []
-    if cheque.payment_image is None:
+    if cheque.payment_image is None and order.fish is None:
         media_list.append(InputMediaPhoto(media=order.order_image_id, caption=
-        f'Id заказа {str(order.id)}\n'
+        f'------Данные заказа------\n'
         f'Дата создания заказа {str(order.date)}\n'
+        f'Дата последнего изменения заказа {str(order.change_date)}\n'
         f'Внутренний артикул {str(order.internal_article)}\n'
         f'Кол-во товара размера S {str(order.S)}\n'
         f'Кол-во товара размера M {str(order.M)}\n'
@@ -479,19 +539,24 @@ async def insert_date_cheque(callback: CallbackQuery, state: FSMContext):
         f'Название магазина {str(order.vendor_name)}\n'
         f'Способ отправки {str(order.sending_method)}\n'
         f'Статус заказа {str(order.order_status)}\n'
-        f'ID чека {str(cheque.id)}\n'
-        f'Дата последнего изменения чека {str(cheque.date)}\n'
+        f'Номер для мешков {str(order.sack_number)}\n'
+        f'------Данные чека------\n'
         f'Дата чека {str(cheque.cheque_date)}\n'
+        f'Дата последнего изменения чека {str(cheque.date)}\n'
         f'Название магазина {str(cheque.vendor_name)}\n'
+        f'Номер чека {str(cheque.cheque_number)}\n'
+        f'Артикул поставщика {str(cheque.vendor_article)}\n'
         f'Цена {str(cheque.price)}\n'
-        f'Статус чека {str(cheque.cheque_status)}\n'))
+        f'Статус чека {str(cheque.cheque_status)}\n'
+                                          ))
         media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
         await callback.message.answer_media_group(media=media_list)
         await callback.message.answer('Выберите действие', reply_markup=kb.select_cheque)
-    elif order.order_status == 'Передан в логистику' and cheque.payment_image is not None:
+    elif order.fish is not None and cheque.payment_image is None:
         media_list.append(InputMediaPhoto(media=order.order_image_id, caption=
-        f'Id заказа {str(order.id)}\n'
+        f'------Данные заказа------\n'
         f'Дата создания заказа {str(order.date)}\n'
+        f'Дата последнего изменения заказа {str(order.change_date)}\n'
         f'Внутренний артикул {str(order.internal_article)}\n'
         f'Кол-во товара размера S {str(order.S)}\n'
         f'Кол-во товара размера M {str(order.M)}\n'
@@ -499,20 +564,63 @@ async def insert_date_cheque(callback: CallbackQuery, state: FSMContext):
         f'Название магазина {str(order.vendor_name)}\n'
         f'Способ отправки {str(order.sending_method)}\n'
         f'Статус заказа {str(order.order_status)}\n'
-        f'FISH номер заказа {str(order.fish)}\n'
-        f'ID чека {str(cheque.id)}\n'
-        f'Дата последнего изменения чека {str(cheque.date)}\n'
+        f'Номер для мешков {str(order.sack_number)}\n'
+        f'------Данные чека------\n'
         f'Дата чека {str(cheque.cheque_date)}\n'
+        f'Дата последнего изменения чека {str(cheque.date)}\n'
         f'Название магазина {str(cheque.vendor_name)}\n'
+        f'Номер чека {str(cheque.cheque_number)}\n'
+        f'Артикул поставщика {str(cheque.vendor_article)}\n'
         f'Цена {str(cheque.price)}\n'
-        f'Статус чека {str(cheque.cheque_status)}\n'))
+        f'Статус чека {str(cheque.cheque_status)}\n'
+        f'------Данные fish------\n'
+        f'Номер fish {str(fish.fish)}\n'
+        f'Дата fish {str(fish.date)}\n'
+        f'Вес {str(fish.weight)} кг\n'
+        f'Кол-во мешков {str(fish.sack_count)}\n'
+        f'Способ отправки {str(fish.sending_method)}\n'
+                                          ))
         media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
-        media_list.append(InputMediaPhoto(media=fish_scalar.fish_image_id))
+        media_list.append(InputMediaPhoto(media=fish.fish_image_id))
+        await callback.message.answer_media_group(media=media_list)
+        await callback.message.answer('Выберите действие', reply_markup=kb.select_cheque)
+    elif order.fish is not None and cheque.payment_image is not None:
+        media_list.append(InputMediaPhoto(media=order.order_image_id, caption=
+        f'------Данные заказа------\n'
+        f'Дата создания заказа {str(order.date)}\n'
+        f'Дата последнего изменения заказа {str(order.change_date)}\n'
+        f'Внутренний артикул {str(order.internal_article)}\n'
+        f'Кол-во товара размера S {str(order.S)}\n'
+        f'Кол-во товара размера M {str(order.M)}\n'
+        f'Кол-во товара размера L {str(order.L)}\n'
+        f'Название магазина {str(order.vendor_name)}\n'
+        f'Способ отправки {str(order.sending_method)}\n'
+        f'Статус заказа {str(order.order_status)}\n'
+        f'Номер для мешков {str(order.sack_number)}\n'
+        f'------Данные чека------\n'
+        f'Дата чека {str(cheque.cheque_date)}\n'
+        f'Дата последнего изменения чека {str(cheque.date)}\n'
+        f'Название магазина {str(cheque.vendor_name)}\n'
+        f'Номер чека {str(cheque.cheque_number)}\n'
+        f'Артикул поставщика {str(cheque.vendor_article)}\n'
+        f'Цена {str(cheque.price)}\n'
+        f'Статус чека {str(cheque.cheque_status)}\n'
+        f'------Данные fish------\n'
+        f'Номер fish {str(fish.fish)}\n'
+        f'Дата fish {str(fish.date)}\n'
+        f'Вес {str(fish.weight)} кг\n'
+        f'Кол-во мешков {str(fish.sack_count)}\n'
+        f'Способ отправки {str(fish.sending_method)}\n'
+                                          ))
+        media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
+        media_list.append(InputMediaPhoto(media=cheque.payment_image))
+        media_list.append(InputMediaPhoto(media=fish.fish_image_id))
         await callback.message.answer_media_group(media=media_list)
     elif cheque.payment_image is not None:
         media_list.append(InputMediaPhoto(media=order.order_image_id, caption=
-        f'Id заказа {str(order.id)}\n'
+        f'------Данные заказа------\n'
         f'Дата создания заказа {str(order.date)}\n'
+        f'Дата последнего изменения заказа {str(order.change_date)}\n'
         f'Внутренний артикул {str(order.internal_article)}\n'
         f'Кол-во товара размера S {str(order.S)}\n'
         f'Кол-во товара размера M {str(order.M)}\n'
@@ -520,12 +628,16 @@ async def insert_date_cheque(callback: CallbackQuery, state: FSMContext):
         f'Название магазина {str(order.vendor_name)}\n'
         f'Способ отправки {str(order.sending_method)}\n'
         f'Статус заказа {str(order.order_status)}\n'
-        f'ID чека {str(cheque.id)}\n'
+        f'Номер для мешков {str(order.sack_number)}\n'
+        f'------Данные чека------\n'
+        f'Дата чека {str(cheque.cheque_date)}\n'
         f'Дата последнего изменения чека {str(cheque.date)}\n'
-        f'Дата чека {cheque.cheque_date}'
         f'Название магазина {str(cheque.vendor_name)}\n'
+        f'Номер чека {str(cheque.cheque_number)}\n'
+        f'Артикул поставщика {str(cheque.vendor_article)}\n'
         f'Цена {str(cheque.price)}\n'
-        f'Статус чека {str(cheque.cheque_status)}\n'))
+        f'Статус чека {str(cheque.cheque_status)}\n'
+                                          ))
         media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
         media_list.append(InputMediaPhoto(media=cheque.payment_image))
         await callback.message.answer_media_group(media=media_list)
@@ -552,3 +664,146 @@ async def insert_date_cheque(message: Message, state: FSMContext):
         await state.clear()
     except TypeError:
         await message.answer('Ошибка, попробуйте еще раз')
+
+
+"""Просмотр заказов-------------------------------------------------------------------------------------------------"""
+
+
+@router.message(F.text == 'Посмотреть заказы')
+async def check_all_orders(message: Message, state: FSMContext):
+    if message.from_user.id in senders:
+        await state.clear()
+        await message.answer('Выберите категорию чека:', reply_markup=await kb.inline_all_orders_send())
+
+
+@router.callback_query(F.data.startswith('get_info_'))
+async def get_all_cheques(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    order_id = str(callback.data)[9:]
+    order = await rq.get_order(order_id)
+    cheque = await rq.get_cheque_by_orderid(order_id)
+    fish = await rq.get_fish_obj(order_id)
+    media_list = []
+    if order.cheque_image_id is None and order.fish is None:
+        media_list.append(InputMediaPhoto(media=order.order_image_id, caption=
+        f'------Данные заказа------\n'
+        f'Дата создания заказа {str(order.date)}\n'
+        f'Дата последнего изменения заказа {str(order.change_date)}\n'
+        f'Внутренний артикул {str(order.internal_article)}\n'
+        f'Кол-во товара размера S {str(order.S)}\n'
+        f'Кол-во товара размера M {str(order.M)}\n'
+        f'Кол-во товара размера L {str(order.L)}\n'
+        f'Название магазина {str(order.vendor_name)}\n'
+        f'Способ отправки {str(order.sending_method)}\n'
+        f'Статус заказа {str(order.order_status)}\n'))
+        await callback.message.answer_media_group(media=media_list)
+    elif cheque.cheque_image_id is not None and order.fish is None and cheque.payment_image is None:
+        media_list.append(InputMediaPhoto(media=order.order_image_id, caption=
+        f'------Данные заказа------\n'
+        f'Дата создания заказа {str(order.date)}\n'
+        f'Дата последнего изменения заказа {str(order.change_date)}\n'
+        f'Внутренний артикул {str(order.internal_article)}\n'
+        f'Кол-во товара размера S {str(order.S)}\n'
+        f'Кол-во товара размера M {str(order.M)}\n'
+        f'Кол-во товара размера L {str(order.L)}\n'
+        f'Название магазина {str(order.vendor_name)}\n'
+        f'Способ отправки {str(order.sending_method)}\n'
+        f'Статус заказа {str(order.order_status)}\n'
+        f'Номер для мешков {str(order.sack_number)}\n'
+        f'------Данные чека------\n'
+        f'Дата чека {str(cheque.cheque_date)}\n'
+        f'Дата последнего изменения чека {str(cheque.date)}\n'
+        f'Название магазина {str(cheque.vendor_name)}\n'
+        f'Номер чека {str(cheque.cheque_number)}\n'
+        f'Артикул поставщика {str(cheque.vendor_article)}\n'
+        f'Цена {str(cheque.price)}\n'
+        f'Статус чека {str(cheque.cheque_status)}\n'))
+        media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
+        await callback.message.answer_media_group(media=media_list)
+    elif cheque.payment_image is not None and order.fish is None and cheque.cheque_image_id is not None:
+        media_list.append(InputMediaPhoto(media=order.order_image_id, caption=
+        f'------Данные заказа------\n'
+        f'Дата создания заказа {str(order.date)}\n'
+        f'Дата последнего изменения заказа {str(order.change_date)}\n'
+        f'Внутренний артикул {str(order.internal_article)}\n'
+        f'Кол-во товара размера S {str(order.S)}\n'
+        f'Кол-во товара размера M {str(order.M)}\n'
+        f'Кол-во товара размера L {str(order.L)}\n'
+        f'Название магазина {str(order.vendor_name)}\n'
+        f'Способ отправки {str(order.sending_method)}\n'
+        f'Статус заказа {str(order.order_status)}\n'
+        f'Номер для мешков {str(order.sack_number)}\n'
+        f'------Данные чека------\n'
+        f'Дата чека {str(cheque.cheque_date)}\n'
+        f'Дата последнего изменения чека {str(cheque.date)}\n'
+        f'Название магазина {str(cheque.vendor_name)}\n'
+        f'Номер чека {str(cheque.cheque_number)}\n'
+        f'Артикул поставщика {str(cheque.vendor_article)}\n'
+        f'Цена {str(cheque.price)}\n'
+        f'Статус чека {str(cheque.cheque_status)}\n'))
+        media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
+        media_list.append(InputMediaPhoto(media=cheque.payment_image))
+        await callback.message.answer_media_group(media=media_list)
+    elif order.cheque_image_id is not None and cheque.payment_image is not None and order.fish is not None:
+        media_list.append(InputMediaPhoto(media=order.order_image_id, caption=
+        f'------Данные заказа------\n'
+        f'Дата создания заказа {str(order.date)}\n'
+        f'Дата последнего изменения заказа {str(order.change_date)}\n'
+        f'Внутренний артикул {str(order.internal_article)}\n'
+        f'Кол-во товара размера S {str(order.S)}\n'
+        f'Кол-во товара размера M {str(order.M)}\n'
+        f'Кол-во товара размера L {str(order.L)}\n'
+        f'Название магазина {str(order.vendor_name)}\n'
+        f'Способ отправки {str(order.sending_method)}\n'
+        f'Статус заказа {str(order.order_status)}\n'
+        f'Номер для мешков {str(order.sack_number)}\n'
+        f'------Данные чека------\n'
+        f'Дата чека {str(cheque.cheque_date)}\n'
+        f'Дата последнего изменения чека {str(cheque.date)}\n'
+        f'Название магазина {str(cheque.vendor_name)}\n'
+        f'Номер чека {str(cheque.cheque_number)}\n'
+        f'Артикул поставщика {str(cheque.vendor_article)}\n'
+        f'Цена {str(cheque.price)}\n'
+        f'Статус чека {str(cheque.cheque_status)}\n'
+        f'------Данные fish------\n'
+        f'Номер fish {str(fish.fish)}\n'
+        f'Дата fish {str(fish.date)}\n'
+        f'Вес {str(fish.weight)} кг\n'
+        f'Кол-во мешков {str(fish.sack_count)}\n'
+        f'Способ отправки {str(fish.sending_method)}\n'))
+        media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
+        media_list.append(InputMediaPhoto(media=cheque.payment_image))
+        media_list.append(InputMediaPhoto(media=fish.fish_image_id))
+        await callback.message.answer_media_group(media=media_list)
+    elif order.cheque_image_id is not None and cheque.payment_image is None and order.fish is not None:
+        media_list.append(InputMediaPhoto(media=order.order_image_id, caption=
+        f'------Данные заказа------\n'
+        f'Дата создания заказа {str(order.date)}\n'
+        f'Дата последнего изменения заказа {str(order.change_date)}\n'
+        f'Внутренний артикул {str(order.internal_article)}\n'
+        f'Кол-во товара размера S {str(order.S)}\n'
+        f'Кол-во товара размера M {str(order.M)}\n'
+        f'Кол-во товара размера L {str(order.L)}\n'
+        f'Название магазина {str(order.vendor_name)}\n'
+        f'Способ отправки {str(order.sending_method)}\n'
+        f'Статус заказа {str(order.order_status)}\n'
+        f'Номер для мешков {str(order.sack_number)}\n'
+        f'------Данные чека------\n'
+        f'Дата чека {str(cheque.cheque_date)}\n'
+        f'Дата последнего изменения чека {str(cheque.date)}\n'
+        f'Название магазина {str(cheque.vendor_name)}\n'
+        f'Номер чека {str(cheque.cheque_number)}\n'
+        f'Артикул поставщика {str(cheque.vendor_article)}\n'
+        f'Цена {str(cheque.price)}\n'
+        f'Статус чека {str(cheque.cheque_status)}\n'
+        f'------Данные fish------\n'
+        f'Номер fish {str(fish.fish)}\n'
+        f'Дата fish {str(fish.date)}\n'
+        f'Вес {str(fish.weight)} кг\n'
+        f'Кол-во мешков {str(fish.sack_count)}\n'
+        f'Способ отправки {str(fish.sending_method)}\n'))
+        media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
+        media_list.append(InputMediaPhoto(media=fish.fish_image_id))
+        await callback.message.answer_media_group(media=media_list)
+
+"""-----------------------------------------------------------------------------------------------------------------"""

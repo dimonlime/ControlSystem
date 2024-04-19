@@ -17,17 +17,18 @@ class Order(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    internal_article: Mapped[str] = mapped_column(String(25), nullable=True)
+    change_date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    internal_article: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
     S: Mapped[int] = mapped_column()
     M: Mapped[int] = mapped_column()
     L: Mapped[int] = mapped_column()
-    vendor_name: Mapped[str] = mapped_column(String(25), nullable=True)
-    sending_method: Mapped[str] = mapped_column(String(25), nullable=True)
-    order_image_id: Mapped[int] = mapped_column(nullable=True)
+    vendor_name: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
+    sending_method: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
+    order_image_id: Mapped[int] = mapped_column(nullable=True, default=None)
     order_status: Mapped[str] = mapped_column(String(25), nullable=True, default='Заказ создан')
     cheque_image_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
-    fish: Mapped[int] = mapped_column(nullable=True)
-    sack_number: Mapped[int] = mapped_column(nullable=True, default=None, unique=True)
+    fish: Mapped[int] = mapped_column(nullable=True, default=None)
+    sack_number: Mapped[int] = mapped_column(nullable=True, unique=True)
 
 
 class Cheque(Base):
@@ -52,7 +53,7 @@ class Fish(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'))
     fish: Mapped[int] = mapped_column(nullable=True, default=None)
-    date: Mapped[datetime] = mapped_column(nullable=True, default=None)
+    date: Mapped[datetime] = mapped_column(String(25), nullable=True, default=None)
     weight: Mapped[int] = mapped_column(nullable=True, default=None)
     sack_count: Mapped[int] = mapped_column(nullable=True, default=None)
     sending_method: Mapped[str] = mapped_column(String(25), nullable=True, default=None)

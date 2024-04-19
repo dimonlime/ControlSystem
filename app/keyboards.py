@@ -135,3 +135,16 @@ async def inline_paid_cheques():
                 keyboard.add(InlineKeyboardButton(text=f'ID чека: "{cheque.id}"; Статус чека: "{cheque.cheque_status}"',
                                                   callback_data=f'view_cheque_{cheque.id}'))
     return keyboard.adjust(1).as_markup()
+
+
+async def inline_all_orders_send():
+    keyboard = InlineKeyboardBuilder()
+    data = await rq.all_orders()
+    for order in data:
+        today_date = datetime.now()
+        half_year = today_date - timedelta(days=365 / 2)
+        order_date = datetime.strptime(order.date, "%Y-%m-%d %H:%M:%S")
+        if half_year <= order_date <= today_date:
+            keyboard.add(InlineKeyboardButton(text=f'Дата: "{order.date}"; Арт: "{order.internal_article}"',
+                                              callback_data=f'get_info_{order.id}'))
+    return keyboard.adjust(1).as_markup()

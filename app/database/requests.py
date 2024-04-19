@@ -42,15 +42,21 @@ async def get_cheque(cheque_id):
         return cheque
 
 
+async def get_cheque_by_orderid(order_id):
+    async with async_session() as session:
+        cheque = await session.scalar(select(Cheque).where(Cheque.order_id == order_id))
+        return cheque
+
+
 async def get_order(order_id):
     async with async_session() as session:
         order = await session.scalar(select(Order).where(Order.id == order_id))
         return order
 
 
-async def get_fish(fish):
+async def get_fish_obj(order_id):
     async with async_session() as session:
-        fish = await session.scalar(select(Fish).where(Fish.fish == fish))
+        fish = await session.scalar(select(Fish).where(Fish.order_id == order_id))
         return fish
 
 
@@ -97,10 +103,11 @@ async def set_cheque_status(cheque_id, cheque_status, cheque_date):
         await session.commit()
 
 
-async def edit_order_status(order_id, order_status):
+async def edit_order_status(order_id, order_status, change_date):
     async with async_session() as session:
         order = await session.scalar(select(Order).where(Order.id == order_id))
         order.order_status = order_status
+        order.change_date = change_date
         await session.commit()
 
 
