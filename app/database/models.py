@@ -19,9 +19,9 @@ class Order(Base):
     date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     change_date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     internal_article: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
-    S: Mapped[int] = mapped_column()
-    M: Mapped[int] = mapped_column()
-    L: Mapped[int] = mapped_column()
+    S: Mapped[int] = mapped_column(nullable=True, default=None)
+    M: Mapped[int] = mapped_column(nullable=True, default=None)
+    L: Mapped[int] = mapped_column(nullable=True, default=None)
     vendor_name: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
     sending_method: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
     order_image_id: Mapped[int] = mapped_column(nullable=True, default=None)
@@ -29,6 +29,9 @@ class Order(Base):
     cheque_image_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
     fish: Mapped[int] = mapped_column(nullable=True, default=None)
     sack_number: Mapped[int] = mapped_column(nullable=True, unique=True)
+    fact_S: Mapped[int] = mapped_column(nullable=True, default=None)
+    fact_M: Mapped[int] = mapped_column(nullable=True, default=None)
+    fact_L: Mapped[int] = mapped_column(nullable=True, default=None)
 
 
 class Cheque(Base):

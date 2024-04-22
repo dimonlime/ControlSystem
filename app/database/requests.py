@@ -122,3 +122,12 @@ async def get_fish(order_id):
     async with async_session() as session:
         order = await session.scalar(select(Order).where(Order.id == order_id))
         return order.fish
+
+
+async def insert_fact(order_id, fact_s, fact_m, fact_l):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.fact_S = fact_s
+        order.fact_M = fact_m
+        order.fact_L = fact_l
+        await session.commit()
