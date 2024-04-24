@@ -5,6 +5,7 @@ from app.database.models import Cheque, Order, Fish
 from sqlalchemy import select
 
 import random
+import json
 
 
 async def create_cheque_db(vendor_name, price, image, order_id, cheque_date, cheque_number, vendor_article):
@@ -22,10 +23,10 @@ async def create_cheque_db(vendor_name, price, image, order_id, cheque_date, che
                 pass
 
 
-async def create_order_db(internal_article, s, m, l, vendor_name, sending_method, image_id):
+async def create_order_db(internal_article, s, m, l, vendor_name, sending_method, image_id, delivery_id):
     async with async_session() as session:
         session.add(Order(internal_article=internal_article, S=s, M=m, L=l, vendor_name=vendor_name,
-                          sending_method=sending_method, order_image_id=image_id))
+                          sending_method=sending_method, order_image_id=image_id, delivery_id=delivery_id))
         await session.commit()
 
 
@@ -131,3 +132,17 @@ async def insert_fact(order_id, fact_s, fact_m, fact_l):
         order.fact_M = fact_m
         order.fact_L = fact_l
         await session.commit()
+
+
+#async def get_order_test(order_image):
+#    async with async_session() as session:
+#        order = await session.scalar(select(Order).where(Order.order_image_id == order_image))
+#        return order
+#
+#
+#async def set_sack_images(images, order_id):
+#    async with async_session() as session:
+#        order = await session.scalar(select(Order).where(Order.id == order_id))
+#        images_json = json.dumps(images)
+#        order.sack_images = images_json
+#        await session.commit()

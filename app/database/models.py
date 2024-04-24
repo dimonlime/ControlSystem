@@ -1,7 +1,8 @@
 from datetime import datetime
-from sqlalchemy import BigInteger, String, ForeignKey, Null
+from sqlalchemy import String, ForeignKey, Null, Text, Column
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
+import json
 
 engine = create_async_engine(url='sqlite+aiosqlite:///db.sqlite3')
 
@@ -16,8 +17,9 @@ class Order(Base):
     __tablename__ = 'orders'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    change_date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    delivery_id: Mapped[int] = mapped_column(nullable=True, default=None)
+    date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+    change_date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
     internal_article: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
     S: Mapped[int] = mapped_column(nullable=True, default=None)
     M: Mapped[int] = mapped_column(nullable=True, default=None)
@@ -32,14 +34,15 @@ class Order(Base):
     fact_S: Mapped[int] = mapped_column(nullable=True, default=None)
     fact_M: Mapped[int] = mapped_column(nullable=True, default=None)
     fact_L: Mapped[int] = mapped_column(nullable=True, default=None)
+    sack_images = Column(Text, nullable=True, default=None)
 
 
 class Cheque(Base):
     __tablename__ = 'cheques'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    cheque_date: Mapped[datetime] = mapped_column(String(25), nullable=True, default=None)
+    date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+    cheque_date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
     vendor_name: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
     cheque_number: Mapped[int] = mapped_column(nullable=True, default=None)
     vendor_article: Mapped[int] = mapped_column(nullable=True, default=None)
