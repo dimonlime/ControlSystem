@@ -198,10 +198,11 @@ async def insert_image_cheque(message: Message, state: FSMContext):
     try:
         await state.update_data(image=message.photo[-1].file_id)
         await state.update_data(order_change_date=datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+        await state.update_data(date=datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
         data = await state.get_data()
         order = await rq.get_order(data['order_id'])
         await rq.create_cheque_db(order.vendor_name, data['price'], data['image'], data['order_id'],
-                                  data['cheque_date'], data['cheque_number'], data['vendor_article'])
+                                  data['cheque_date'], data['cheque_number'], data['vendor_article'], data['date'])
         await rq.edit_order_status(data['order_id'], data['order_status'], data['order_change_date'])
         await rq.set_order_cheque_image(data['order_id'], data['image'])
         order = await rq.get_order(data['order_id'])
@@ -636,10 +637,15 @@ async def choose_sending_method(callback: CallbackQuery, state: FSMContext):
 async def insert_image(message: Message, state: FSMContext):
     try:
         await state.update_data(order_image=message.photo[-1].file_id)
+        date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        change_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        await state.update_data(date=date)
+        await state.update_data(change_date=change_date)
         data = await state.get_data()
         await rq.create_order_db(data['internal_article'], data['quantity_s'], data['quantity_m'],
                                  data['quantity_l'], data['vendor_name'], data['sending_method'], data['order_image'],
-                                 data['delivery_id'], data['color'], data['vendor_internal_article'])
+                                 data['delivery_id'], data['color'], data['vendor_internal_article'], data['date'],
+                                 data['change_date'])
         #order = await rq.get_order_test(data['order_image'])
         #json_str = '{"name": "John", "age": 30, "city": "New York"}'
         #await rq.set_sack_images(json_str, order.id)

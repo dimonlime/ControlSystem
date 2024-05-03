@@ -8,13 +8,14 @@ import random
 import json
 
 
-async def create_cheque_db(vendor_name, price, image, order_id, cheque_date, cheque_number, vendor_article):
+async def create_cheque_db(vendor_name, price, image, order_id, cheque_date, cheque_number, vendor_article, date):
     async with async_session() as session:
         while True:
             try:
                 number = random.randint(100000, 999999)
                 session.add(Cheque(vendor_name=vendor_name, price=price, cheque_image_id=image, order_id=order_id,
-                                   cheque_date=cheque_date, cheque_number=cheque_number, vendor_article=vendor_article))
+                                   cheque_date=cheque_date, cheque_number=cheque_number, vendor_article=vendor_article,
+                                   date=date))
                 order = await session.scalar(select(Order).where(Order.id == order_id))
                 order.sack_number = number
                 await session.commit()
@@ -23,11 +24,13 @@ async def create_cheque_db(vendor_name, price, image, order_id, cheque_date, che
                 pass
 
 
-async def create_order_db(internal_article, s, m, l, vendor_name, sending_method, image_id, delivery_id, color, vendor_internal_article):
+async def create_order_db(internal_article, s, m, l, vendor_name, sending_method, image_id, delivery_id, color,
+                          vendor_internal_article, date, change_date):
     async with async_session() as session:
         session.add(Order(internal_article=internal_article, S=s, M=m, L=l, vendor_name=vendor_name,
                           sending_method=sending_method, order_image_id=image_id, delivery_id=delivery_id,
-                          color=color, vendor_internal_article=vendor_internal_article))
+                          color=color, vendor_internal_article=vendor_internal_article, date=date,
+                          change_date=change_date))
         await session.commit()
 
 
@@ -134,14 +137,13 @@ async def insert_fact(order_id, fact_s, fact_m, fact_l):
         order.fact_L = fact_l
         await session.commit()
 
-
-#async def get_order_test(order_image):
+# async def get_order_test(order_image):
 #    async with async_session() as session:
 #        order = await session.scalar(select(Order).where(Order.order_image_id == order_image))
 #        return order
 #
 #
-#async def set_sack_images(images, order_id):
+# async def set_sack_images(images, order_id):
 #    async with async_session() as session:
 #        order = await session.scalar(select(Order).where(Order.id == order_id))
 #        images_json = json.dumps(images)

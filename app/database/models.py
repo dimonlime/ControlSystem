@@ -18,8 +18,8 @@ class Order(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     delivery_id: Mapped[int] = mapped_column(nullable=True, default=None)
-    date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
-    change_date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+    date: Mapped[datetime] = mapped_column(String(25))
+    change_date: Mapped[datetime] = mapped_column(String(25))
     internal_article: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
     S: Mapped[int] = mapped_column(nullable=True, default=None)
     M: Mapped[int] = mapped_column(nullable=True, default=None)
@@ -43,8 +43,8 @@ class Cheque(Base):
     __tablename__ = 'cheques'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
-    cheque_date: Mapped[datetime] = mapped_column(String(25), default=datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+    date: Mapped[datetime] = mapped_column(String(25))
+    cheque_date: Mapped[datetime] = mapped_column(String(25))
     vendor_name: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
     cheque_number: Mapped[int] = mapped_column(nullable=True, default=None)
     vendor_article: Mapped[int] = mapped_column(nullable=True, default=None)
