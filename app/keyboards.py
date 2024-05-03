@@ -17,8 +17,8 @@ sender_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Посмотреть заказы')]
 ], resize_keyboard=True)
 
-test = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='Вывести список заказов', callback_data='test')]
+vendor_internal_article = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='Пропустить', callback_data='skip')]
 ])
 
 cheques_category = InlineKeyboardMarkup(inline_keyboard=[

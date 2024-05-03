@@ -9,7 +9,7 @@ from app.handlers import router
 from app.database.models import async_main
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from app.time_update import fire_cheques_check
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+#asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 dp = Dispatcher()
 

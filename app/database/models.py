@@ -35,6 +35,8 @@ class Order(Base):
     fact_M: Mapped[int] = mapped_column(nullable=True, default=None)
     fact_L: Mapped[int] = mapped_column(nullable=True, default=None)
     sack_images = Column(Text, nullable=True, default=None)
+    color: Mapped[str] = mapped_column(String(50), nullable=True)
+    vendor_internal_article: Mapped[str] = mapped_column(String(50), nullable=True, default='Не заполнено')
 
 
 class Cheque(Base):

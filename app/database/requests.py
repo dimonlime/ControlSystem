@@ -23,10 +23,11 @@ async def create_cheque_db(vendor_name, price, image, order_id, cheque_date, che
                 pass
 
 
-async def create_order_db(internal_article, s, m, l, vendor_name, sending_method, image_id, delivery_id):
+async def create_order_db(internal_article, s, m, l, vendor_name, sending_method, image_id, delivery_id, color, vendor_internal_article):
     async with async_session() as session:
         session.add(Order(internal_article=internal_article, S=s, M=m, L=l, vendor_name=vendor_name,
-                          sending_method=sending_method, order_image_id=image_id, delivery_id=delivery_id))
+                          sending_method=sending_method, order_image_id=image_id, delivery_id=delivery_id,
+                          color=color, vendor_internal_article=vendor_internal_article))
         await session.commit()
 
 

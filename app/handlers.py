@@ -25,6 +25,8 @@ class create_order_state(StatesGroup):
     insert_sending_method = State()
     insert_order_image_id = State()
     insert_delivery_id = State()
+    insert_color = State()
+    insert_vendor_internal_article = State()
 
 
 class create_cheque_state(StatesGroup):
@@ -101,10 +103,12 @@ async def edit_order_status_1(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer_photo(caption=f'*------Данные заказа------*\n'
                                                 f'*Дата создания заказа:* {str(order.date)}\n'
                                                 f'*Дата последнего изменения заказа:* {str(order.change_date)}\n'
-                                                f'*Внутренний артикул:* {str(order.internal_article)}\n'
+                                                f'*Внутренний артикул товара:* {str(order.internal_article)}\n'
+                                                f'*Внутренний артикул поставщика:* {str(order.vendor_internal_article)}\n'
                                                 f'*Кол-во товара размера S:* {str(order.S)}\n'
                                                 f'*Кол-во товара размера M:* {str(order.M)}\n'
                                                 f'*Кол-во товара размера L:* {str(order.L)}\n'
+                                                f'*Цвет:* {str(order.color)}\n'
                                                 f'*Название магазина:* {str(order.vendor_name)}\n'
                                                 f'*Способ отправки:* {str(order.sending_method)}\n'
                                                 f'*Статус заказа:* {str(order.order_status)}\n',
@@ -142,7 +146,7 @@ async def edit_order_status_2(callback: CallbackQuery, state: FSMContext):
 
 
 @router.message(create_cheque_state.insert_date_cheque)
-async def insert_vendor_cheque(message: Message, state: FSMContext):
+async def insert_cheque_date(message: Message, state: FSMContext):
     try:
         message_date = str(message.text)
         cheque_date = datetime.strptime(message_date, "%d-%m-%Y %H:%M")
@@ -157,7 +161,7 @@ async def insert_vendor_cheque(message: Message, state: FSMContext):
 
 
 @router.message(create_cheque_state.insert_cheque_number)
-async def insert_price_cheque(message: Message, state: FSMContext):
+async def insert_cheque_number(message: Message, state: FSMContext):
     try:
         cheque_number = int(message.text)
         await state.update_data(cheque_number=cheque_number)
@@ -168,7 +172,7 @@ async def insert_price_cheque(message: Message, state: FSMContext):
 
 
 @router.message(create_cheque_state.insert_vendor_article)
-async def insert_price_cheque(message: Message, state: FSMContext):
+async def insert_vendor_article(message: Message, state: FSMContext):
     try:
         vendor_article = int(message.text)
         await state.update_data(vendor_article=vendor_article)
@@ -215,7 +219,7 @@ async def insert_image_cheque(message: Message, state: FSMContext):
 
 
 @router.message(create_cheque_state.insert_fact_s)
-async def insert_fish(message: Message, state: FSMContext):
+async def insert_fact_s(message: Message, state: FSMContext):
     try:
         fact_s = int(message.text)
         await state.update_data(fact_s=fact_s)
@@ -226,7 +230,7 @@ async def insert_fish(message: Message, state: FSMContext):
 
 
 @router.message(create_cheque_state.insert_fact_m)
-async def insert_fish(message: Message, state: FSMContext):
+async def insert_fact_m(message: Message, state: FSMContext):
     try:
         fact_m = int(message.text)
         await state.update_data(fact_m=fact_m)
@@ -237,7 +241,7 @@ async def insert_fish(message: Message, state: FSMContext):
 
 
 @router.message(create_cheque_state.insert_fact_l)
-async def insert_fish(message: Message, state: FSMContext):
+async def insert_fact_l(message: Message, state: FSMContext):
     try:
         fact_l = int(message.text)
         await state.update_data(fact_l=fact_l)
@@ -266,7 +270,7 @@ async def insert_fish(message: Message, state: FSMContext):
 
 
 @router.message(create_cheque_state.insert_fish_date)
-async def insert_fish(message: Message, state: FSMContext):
+async def insert_fish_date(message: Message, state: FSMContext):
     try:
         message_date = str(message.text)
         fish_date = datetime.strptime(message_date, "%d-%m-%Y %H:%M:%S")
@@ -281,7 +285,7 @@ async def insert_fish(message: Message, state: FSMContext):
 
 
 @router.message(create_cheque_state.insert_fish_weight)
-async def insert_fish(message: Message, state: FSMContext):
+async def insert_fish_weight(message: Message, state: FSMContext):
     try:
         weight = int(message.text)
         await state.update_data(weight=weight)
@@ -292,7 +296,7 @@ async def insert_fish(message: Message, state: FSMContext):
 
 
 @router.message(create_cheque_state.insert_sack_count)
-async def insert_fish(message: Message, state: FSMContext):
+async def insert_fish_sack_count(message: Message, state: FSMContext):
     try:
         sack_count = int(message.text)
         await state.update_data(sack_count=sack_count)
@@ -303,7 +307,7 @@ async def insert_fish(message: Message, state: FSMContext):
 
 
 @router.message(create_cheque_state.insert_fish_image_id)
-async def insert_fish(message: Message, state: FSMContext):
+async def insert_fish_image(message: Message, state: FSMContext):
     try:
         await state.update_data(fish_image=message.photo[-1].file_id)
         await state.update_data(order_change_date=datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
@@ -324,13 +328,13 @@ async def insert_fish(message: Message, state: FSMContext):
 
 
 @router.message(F.text == 'Проверить чеки')
-async def edit_order_status(message: Message, state: FSMContext):
+async def check_cheques(message: Message, state: FSMContext):
     if message.from_user.id in recipients:
         await message.answer('Выберите категорию чека:', reply_markup=kb.cheques_category_2)
 
 
 @router.callback_query(F.data == 'paid_cheques')
-async def get_unpaid_cheques(callback: CallbackQuery, state: FSMContext):
+async def get_paid_cheques(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.answer('Список оплаченных чеков', reply_markup=await kb.inline_paid_cheques())
 
@@ -342,7 +346,7 @@ async def get_unpaid_cheques(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data.startswith('view_cheque_'))
-async def insert_date_cheque(callback: CallbackQuery, state: FSMContext):
+async def view_cheque(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await state.set_state(change_cheque_status.select_cheque)
     cheque_id = str(callback.data)[12:]
@@ -385,22 +389,23 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
     try:
         await callback.message.answer(
             f'*------Данные заказа------*\n'
-            f'*Дата создания заказа:* {str(order.date)}\n'
-            f'*Дата последнего изменения заказа:* {str(order.change_date)}\n'
-            f'*Внутренний артикул:* {str(order.internal_article)}\n'
-            f'*Кол-во товара размера S:* {str(order.S)}\n'
-            f'*Кол-во товара размера M:* {str(order.M)}\n'
-            f'*Кол-во товара размера L:* {str(order.L)}\n'
-            f'*Название магазина:* {str(order.vendor_name)}\n'
-            f'*Способ отправки:* {str(order.sending_method)}\n'
-            f'*Номер для мешков:* {str(order.sack_number)}\n'
-            f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
+                 f'*Дата создания заказа:* {str(order.date)}\n'
+                 f'*Дата последнего изменения заказа:* {str(order.change_date)}\n'
+                 f'*Внутренний артикул товара:* {str(order.internal_article)}\n'
+                 f'*Внутренний артикул поставщика:* {str(order.vendor_internal_article)}\n'
+                 f'*Кол-во товара размера S:* {str(order.S)}\n'
+                 f'*Кол-во товара размера M:* {str(order.M)}\n'
+                 f'*Кол-во товара размера L:* {str(order.L)}\n'
+                 f'*Цвет:* {str(order.color)}\n'
+                 f'*Название магазина:* {str(order.vendor_name)}\n'
+                 f'*Способ отправки:* {str(order.sending_method)}\n'
+                 f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
     except AttributeError:
         await callback.message.answer('Нет данных')
 
 
 @router.callback_query(F.data == 'cheque_info', change_cheque_status.select_cheque)
-async def order_info(callback: CallbackQuery, state: FSMContext):
+async def cheque_info(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     cheque = await rq.get_cheque_by_orderid(data['order_id'])
@@ -419,7 +424,7 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == 'fish_info', change_cheque_status.select_cheque)
-async def order_info(callback: CallbackQuery, state: FSMContext):
+async def fish_info(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     fish = await rq.get_fish_obj(data['order_id'])
@@ -436,7 +441,7 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == 'fact_info', change_cheque_status.select_cheque)
-async def order_info(callback: CallbackQuery, state: FSMContext):
+async def fact_info(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     order = await rq.get_order(data['order_id'])
@@ -451,7 +456,7 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == 'all_info', change_cheque_status.select_cheque)
-async def order_info(callback: CallbackQuery, state: FSMContext):
+async def all_info(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     cheque = await rq.get_cheque_by_orderid(data['order_id'])
@@ -462,10 +467,12 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
             f'------Данные заказа------\n'
             f'Дата создания заказа: {str(order.date)}\n'
             f'Дата последнего изменения заказа: {str(order.change_date)}\n'
-            f'Внутренний артикул: {str(order.internal_article)}\n'
+            f'Внутренний артикул товара: {str(order.internal_article)}\n'
+            f'Внутренний артикул поставщика: {str(order.vendor_internal_article)}\n'
             f'Кол-во товара размера S: {str(order.S)}\n'
             f'Кол-во товара размера M: {str(order.M)}\n'
             f'Кол-во товара размера L: {str(order.L)}\n'
+            f'Цвет: {str(order.color)}\n'
             f'Название магазина: {str(order.vendor_name)}\n'
             f'Способ отправки: {str(order.sending_method)}\n'
             f'Номер для мешков: {str(order.sack_number)}\n'
@@ -510,14 +517,14 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
 
 
 @router.message(F.text == 'Создать заказ')
-async def create_cheque(message: Message, state: FSMContext):
+async def create_order(message: Message, state: FSMContext):
     if message.from_user.id in senders:
         await state.set_state(create_order_state.insert_delivery_id)
         await message.answer('Введите ID поставки к которой относится заказ:')
 
 
 @router.message(create_order_state.insert_delivery_id)
-async def insert_date_cheque(message: Message, state: FSMContext):
+async def insert_delivery_id(message: Message, state: FSMContext):
     try:
         delivery_id = int(message.text)
         if delivery_id > 0:
@@ -531,18 +538,38 @@ async def insert_date_cheque(message: Message, state: FSMContext):
 
 
 @router.message(create_order_state.insert_internal_article)
-async def insert_date_cheque(message: Message, state: FSMContext):
+async def insert_internal_article(message: Message, state: FSMContext):
     try:
         internal_article = str(message.text)
         await state.update_data(internal_article=internal_article)
+        await state.set_state(create_order_state.insert_vendor_internal_article)
+        await message.answer('Введите внутренний артикул поставщика:', reply_markup=kb.vendor_internal_article)
+    except ValueError:
+        await message.answer('Ошибка, попробуйте еще раз')
+
+
+@router.message(create_order_state.insert_vendor_internal_article)
+async def insert_vendor_internal_article(message: Message, state: FSMContext):
+    try:
+        vendor_internal_article = str(message.text)
+        await state.update_data(vendor_internal_article=vendor_internal_article)
         await state.set_state(create_order_state.insert_s_order)
         await message.answer('Введите кол-во товара размера S:')
     except ValueError:
         await message.answer('Ошибка, попробуйте еще раз')
 
 
+@router.callback_query(F.data == 'skip', create_order_state.insert_vendor_internal_article)
+async def skip_vendor_internal_article(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    vendor_internal_article = 'Не заполнено'
+    await state.update_data(vendor_internal_article=vendor_internal_article)
+    await state.set_state(create_order_state.insert_s_order)
+    await callback.message.answer('Введите кол-во товара размера S:')
+
+
 @router.message(create_order_state.insert_s_order)
-async def insert_date_cheque(message: Message, state: FSMContext):
+async def insert_quantity_s(message: Message, state: FSMContext):
     try:
         quantity_s = int(message.text)
         await state.update_data(quantity_s=quantity_s)
@@ -553,7 +580,7 @@ async def insert_date_cheque(message: Message, state: FSMContext):
 
 
 @router.message(create_order_state.insert_m_order)
-async def insert_date_cheque(message: Message, state: FSMContext):
+async def insert_quantity_m(message: Message, state: FSMContext):
     try:
         quantity_m = int(message.text)
         await state.update_data(quantity_m=quantity_m)
@@ -564,18 +591,29 @@ async def insert_date_cheque(message: Message, state: FSMContext):
 
 
 @router.message(create_order_state.insert_l_order)
-async def insert_date_cheque(message: Message, state: FSMContext):
+async def insert_quantity_l(message: Message, state: FSMContext):
     try:
         quantity_l = int(message.text)
         await state.update_data(quantity_l=quantity_l)
-        await state.set_state(create_order_state.insert_vendor_order)
-        await message.answer('Введите название магазина:')
+        await state.set_state(create_order_state.insert_color)
+        await message.answer('Введите цвет:')
     except ValueError:
         await message.answer('Введите целое число')
 
 
+@router.message(create_order_state.insert_color)
+async def insert_color(message: Message, state: FSMContext):
+    try:
+        color = str(message.text)
+        await state.update_data(color=color)
+        await state.set_state(create_order_state.insert_vendor_order)
+        await message.answer('Введите название магазина:')
+    except ValueError:
+        await message.answer('Ошибка, попробуйте еще раз')
+
+
 @router.message(create_order_state.insert_vendor_order)
-async def insert_date_cheque(message: Message, state: FSMContext):
+async def insert_vendor_name(message: Message, state: FSMContext):
     try:
         vendor_name = str(message.text)
         await state.update_data(vendor_name=vendor_name)
@@ -595,13 +633,13 @@ async def choose_sending_method(callback: CallbackQuery, state: FSMContext):
 
 
 @router.message(create_order_state.insert_order_image_id)
-async def insert_date_cheque(message: Message, state: FSMContext):
+async def insert_image(message: Message, state: FSMContext):
     try:
         await state.update_data(order_image=message.photo[-1].file_id)
         data = await state.get_data()
         await rq.create_order_db(data['internal_article'], data['quantity_s'], data['quantity_m'],
                                  data['quantity_l'], data['vendor_name'], data['sending_method'], data['order_image'],
-                                 data['delivery_id'])
+                                 data['delivery_id'], data['color'], data['vendor_internal_article'])
         #order = await rq.get_order_test(data['order_image'])
         #json_str = '{"name": "John", "age": 30, "city": "New York"}'
         #await rq.set_sack_images(json_str, order.id)
@@ -615,7 +653,7 @@ async def insert_date_cheque(message: Message, state: FSMContext):
 
 
 @router.message(F.text == 'Просмотреть чеки')
-async def create_cheque(message: Message, state: FSMContext):
+async def get_cheques(message: Message, state: FSMContext):
     await state.clear()
     if message.from_user.id in senders:
         await message.answer('Выберите категорию чека:', reply_markup=kb.cheques_category)
@@ -640,7 +678,7 @@ async def get_fire_cheques(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data.startswith('pay_cheque_'))
-async def insert_date_cheque(callback: CallbackQuery, state: FSMContext):
+async def pay_cheques(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await state.set_state(change_cheque_status.select_cheque)
     cheque_id = str(callback.data)[11:]
@@ -693,22 +731,23 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
     try:
         await callback.message.answer(
             f'*------Данные заказа------*\n'
-            f'*Дата создания заказа:* {str(order.date)}\n'
-            f'*Дата последнего изменения заказа:* {str(order.change_date)}\n'
-            f'*Внутренний артикул:* {str(order.internal_article)}\n'
-            f'*Кол-во товара размера S:* {str(order.S)}\n'
-            f'*Кол-во товара размера M:* {str(order.M)}\n'
-            f'*Кол-во товара размера L:* {str(order.L)}\n'
-            f'*Название магазина:* {str(order.vendor_name)}\n'
-            f'*Способ отправки:* {str(order.sending_method)}\n'
-            f'*Номер для мешков:* {str(order.sack_number)}\n'
-            f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
+                 f'*Дата создания заказа:* {str(order.date)}\n'
+                 f'*Дата последнего изменения заказа:* {str(order.change_date)}\n'
+                 f'*Внутренний артикул товара:* {str(order.internal_article)}\n'
+                 f'*Внутренний артикул поставщика:* {str(order.vendor_internal_article)}\n'
+                 f'*Кол-во товара размера S:* {str(order.S)}\n'
+                 f'*Кол-во товара размера M:* {str(order.M)}\n'
+                 f'*Кол-во товара размера L:* {str(order.L)}\n'
+                 f'*Цвет:* {str(order.color)}\n'
+                 f'*Название магазина:* {str(order.vendor_name)}\n'
+                 f'*Способ отправки:* {str(order.sending_method)}\n'
+                 f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
     except AttributeError:
         await callback.message.answer('Нет данных')
 
 
 @router.callback_query(F.data == 'cheque_info', change_cheque_status.select_cheque)
-async def order_info(callback: CallbackQuery, state: FSMContext):
+async def cheque_info(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     cheque = await rq.get_cheque_by_orderid(data['order_id'])
@@ -727,7 +766,7 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == 'fish_info', change_cheque_status.select_cheque)
-async def order_info(callback: CallbackQuery, state: FSMContext):
+async def fish_info(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     fish = await rq.get_fish_obj(data['order_id'])
@@ -744,7 +783,7 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == 'fact_info', change_cheque_status.select_cheque)
-async def order_info(callback: CallbackQuery, state: FSMContext):
+async def fact_info(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     order = await rq.get_order(data['order_id'])
@@ -759,7 +798,7 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == 'all_info', change_cheque_status.select_cheque)
-async def order_info(callback: CallbackQuery, state: FSMContext):
+async def all_info(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     cheque = await rq.get_cheque_by_orderid(data['order_id'])
@@ -770,10 +809,12 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
             f'------Данные заказа------\n'
             f'Дата создания заказа: {str(order.date)}\n'
             f'Дата последнего изменения заказа: {str(order.change_date)}\n'
-            f'Внутренний артикул: {str(order.internal_article)}\n'
+            f'Внутренний артикул товара: {str(order.internal_article)}\n'
+            f'Внутренний артикул поставщика: {str(order.vendor_internal_article)}\n'
             f'Кол-во товара размера S: {str(order.S)}\n'
             f'Кол-во товара размера M: {str(order.M)}\n'
             f'Кол-во товара размера L: {str(order.L)}\n'
+            f'Цвет: {str(order.color)}\n'
             f'Название магазина: {str(order.vendor_name)}\n'
             f'Способ отправки: {str(order.sending_method)}\n'
             f'Номер для мешков: {str(order.sack_number)}\n'
@@ -818,14 +859,14 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == 'pay_cheque', change_cheque_status.select_cheque)
-async def get_all_cheques(callback: CallbackQuery, state: FSMContext):
+async def pay_cheque(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await state.set_state(change_cheque_status.attach_pay_screen)
     await callback.message.answer('Пожалуйста прикрпите скрин оплаты:')
 
 
 @router.message(change_cheque_status.attach_pay_screen)
-async def insert_date_cheque(message: Message, state: FSMContext):
+async def insert_payment_image(message: Message, state: FSMContext):
     try:
         await state.update_data(pay_screen=message.photo[-1].file_id)
         cheque_status = 'Чек оплачен'
@@ -910,22 +951,23 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
     try:
         await callback.message.answer(
             f'*------Данные заказа------*\n'
-            f'*Дата создания заказа:* {str(order.date)}\n'
-            f'*Дата последнего изменения заказа:* {str(order.change_date)}\n'
-            f'*Внутренний артикул:* {str(order.internal_article)}\n'
-            f'*Кол-во товара размера S:* {str(order.S)}\n'
-            f'*Кол-во товара размера M:* {str(order.M)}\n'
-            f'*Кол-во товара размера L:* {str(order.L)}\n'
-            f'*Название магазина:* {str(order.vendor_name)}\n'
-            f'*Способ отправки:* {str(order.sending_method)}\n'
-            f'*Номер для мешков:* {str(order.sack_number)}\n'
-            f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
+                 f'*Дата создания заказа:* {str(order.date)}\n'
+                 f'*Дата последнего изменения заказа:* {str(order.change_date)}\n'
+                 f'*Внутренний артикул товара:* {str(order.internal_article)}\n'
+                 f'*Внутренний артикул поставщика:* {str(order.vendor_internal_article)}\n'
+                 f'*Кол-во товара размера S:* {str(order.S)}\n'
+                 f'*Кол-во товара размера M:* {str(order.M)}\n'
+                 f'*Кол-во товара размера L:* {str(order.L)}\n'
+                 f'*Цвет:* {str(order.color)}\n'
+                 f'*Название магазина:* {str(order.vendor_name)}\n'
+                 f'*Способ отправки:* {str(order.sending_method)}\n'
+                 f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
     except AttributeError:
         await callback.message.answer('Нет данных')
 
 
 @router.callback_query(F.data == 'cheque_info', check_orders.select_order)
-async def order_info(callback: CallbackQuery, state: FSMContext):
+async def cheque_info(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     cheque = await rq.get_cheque_by_orderid(data['order_id'])
@@ -944,7 +986,7 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == 'fish_info', check_orders.select_order)
-async def order_info(callback: CallbackQuery, state: FSMContext):
+async def fish_info(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     fish = await rq.get_fish_obj(data['order_id'])
@@ -961,7 +1003,7 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == 'fact_info', check_orders.select_order)
-async def order_info(callback: CallbackQuery, state: FSMContext):
+async def fact_info(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     order = await rq.get_order(data['order_id'])
@@ -976,7 +1018,7 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == 'all_info', check_orders.select_order)
-async def order_info(callback: CallbackQuery, state: FSMContext):
+async def all_info(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     cheque = await rq.get_cheque_by_orderid(data['order_id'])
@@ -987,10 +1029,12 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
             f'------Данные заказа------\n'
             f'Дата создания заказа: {str(order.date)}\n'
             f'Дата последнего изменения заказа: {str(order.change_date)}\n'
-            f'Внутренний артикул: {str(order.internal_article)}\n'
+            f'Внутренний артикул товара: {str(order.internal_article)}\n'
+            f'Внутренний артикул поставщика: {str(order.vendor_internal_article)}\n'
             f'Кол-во товара размера S: {str(order.S)}\n'
             f'Кол-во товара размера M: {str(order.M)}\n'
             f'Кол-во товара размера L: {str(order.L)}\n'
+            f'Цвет: {str(order.color)}\n'
             f'Название магазина: {str(order.vendor_name)}\n'
             f'Способ отправки: {str(order.sending_method)}\n'
             f'Номер для мешков: {str(order.sack_number)}\n'
