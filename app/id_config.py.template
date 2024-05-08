@@ -1,0 +1,4 @@
+senders = [sender_telegram_id, ..., ]
+recipients = [recipient_telegram_id, ..., ]
+order_status = ['your_order_status', 'your_order_status', 'your_order_status']
+sending_method = ['your_sending_method', 'your_sending_method', 'your_sending_method']

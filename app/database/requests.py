@@ -137,6 +137,7 @@ async def insert_fact(order_id, fact_s, fact_m, fact_l):
         order.fact_L = fact_l
         await session.commit()
 
+
 # async def get_order_test(order_image):
 #    async with async_session() as session:
 #        order = await session.scalar(select(Order).where(Order.order_image_id == order_image))
@@ -149,3 +150,65 @@ async def insert_fact(order_id, fact_s, fact_m, fact_l):
 #        images_json = json.dumps(images)
 #        order.sack_images = images_json
 #        await session.commit()
+
+
+"""Редактирование данных заказа-------------------------------------------------------------------------------------"""
+
+
+async def edit_order_internal_article(order_id, internal_article):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.internal_article = internal_article
+        await session.commit()
+
+
+async def edit_order_vendor_internal_article(order_id, vendor_internal_article):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.vendor_internal_article = vendor_internal_article
+        await session.commit()
+
+
+async def edit_order_s(order_id, quantity):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.S = quantity
+        await session.commit()
+
+
+async def edit_order_m(order_id, quantity):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.M = quantity
+        await session.commit()
+
+
+async def edit_order_l(order_id, quantity):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.L = quantity
+        await session.commit()
+
+
+async def edit_order_color(order_id, color):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.color = color
+        await session.commit()
+
+
+async def edit_order_name(order_id, name):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.vendor_name = name
+        await session.commit()
+
+
+async def edit_order_sending_method(order_id, sending_method):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.sending_method = sending_method
+        await session.commit()
+
+
+"""-----------------------------------------------------------------------------------------------------------------"""

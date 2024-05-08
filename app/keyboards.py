@@ -38,16 +38,28 @@ select_cheque = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Данные чека', callback_data='cheque_info')],
     [InlineKeyboardButton(text='Данные fish', callback_data='fish_info')],
     [InlineKeyboardButton(text='Фактические данные', callback_data='fact_info')],
-    [InlineKeyboardButton(text='Все данные', callback_data='all_info')]
+    [InlineKeyboardButton(text='Все данные', callback_data='all_info')],
+    [InlineKeyboardButton(text='Редактировать данные', callback_data='edit_order')],
 ])
-
 
 view_info = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Данные заказа', callback_data='order_info')],
     [InlineKeyboardButton(text='Данные чека', callback_data='cheque_info')],
     [InlineKeyboardButton(text='Данные fish', callback_data='fish_info')],
     [InlineKeyboardButton(text='Фактические данные', callback_data='fact_info')],
-    [InlineKeyboardButton(text='Все данные', callback_data='all_info')]
+    [InlineKeyboardButton(text='Все данные', callback_data='all_info')],
+    [InlineKeyboardButton(text='Редактировать данные заказа', callback_data='edit_order')],
+])
+
+choose_value = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='Внутренний артикул товара', callback_data='edit_product_article')],
+    [InlineKeyboardButton(text='Внутренний артикул поставщика', callback_data='edit_vendor_article')],
+    [InlineKeyboardButton(text='Кол-во S', callback_data='edit_s_quantity')],
+    [InlineKeyboardButton(text='Кол-во M', callback_data='edit_m_quantity')],
+    [InlineKeyboardButton(text='Кол-во L', callback_data='edit_l_quantity')],
+    [InlineKeyboardButton(text='Цвет', callback_data='edit_color')],
+    [InlineKeyboardButton(text='Название магазина', callback_data='edit_name')],
+    [InlineKeyboardButton(text='Способ отправки', callback_data='edit_sending_method')]
 ])
 
 
@@ -97,7 +109,7 @@ async def inline_delay_cheques():
     data = await rq.delay_cheques()
     for cheque in data:
         today_date = datetime.now()
-        half_year = today_date - timedelta(days=365/2)
+        half_year = today_date - timedelta(days=365 / 2)
         cheque_date = datetime.strptime(cheque.cheque_date, "%d-%m-%Y %H:%M")
         if half_year <= cheque_date <= today_date:
             keyboard.add(InlineKeyboardButton(text=f'Номер чека: "{cheque.cheque_number}", Цена: "{cheque.price}"',
@@ -178,6 +190,7 @@ async def all_incomes():
                                           callback_data=f'income_{income}'))
     return keyboard.adjust(1).as_markup()
 
+
 async def all_incomes_recipients():
     keyboard = InlineKeyboardBuilder()
     data = await rq.all_orders()
@@ -193,3 +206,5 @@ async def all_incomes_recipients():
         keyboard.add(InlineKeyboardButton(text=f'ID Поставки: {income}',
                                           callback_data=f'income_rec{income}'))
     return keyboard.adjust(1).as_markup()
+
+

@@ -60,6 +60,18 @@ class check_orders(StatesGroup):
     select_order = State()
 
 
+class edit_orders(StatesGroup):
+    select_value = State()
+    edit_product_article = State()
+    edit_vendor_article = State()
+    edit_s_quantity = State()
+    edit_m_quantity = State()
+    edit_l_quantity = State()
+    edit_color = State()
+    edit_name = State()
+    edit_sending_method = State()
+
+
 @router.message(CommandStart())
 async def start(message: Message, state: FSMContext):
     if message.from_user.id in senders:
@@ -390,17 +402,17 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
     try:
         await callback.message.answer(
             f'*------Данные заказа------*\n'
-                 f'*Дата создания заказа:* {str(order.date)}\n'
-                 f'*Дата последнего изменения заказа:* {str(order.change_date)}\n'
-                 f'*Внутренний артикул товара:* {str(order.internal_article)}\n'
-                 f'*Внутренний артикул поставщика:* {str(order.vendor_internal_article)}\n'
-                 f'*Кол-во товара размера S:* {str(order.S)}\n'
-                 f'*Кол-во товара размера M:* {str(order.M)}\n'
-                 f'*Кол-во товара размера L:* {str(order.L)}\n'
-                 f'*Цвет:* {str(order.color)}\n'
-                 f'*Название магазина:* {str(order.vendor_name)}\n'
-                 f'*Способ отправки:* {str(order.sending_method)}\n'
-                 f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
+            f'*Дата создания заказа:* {str(order.date)}\n'
+            f'*Дата последнего изменения заказа:* {str(order.change_date)}\n'
+            f'*Внутренний артикул товара:* {str(order.internal_article)}\n'
+            f'*Внутренний артикул поставщика:* {str(order.vendor_internal_article)}\n'
+            f'*Кол-во товара размера S:* {str(order.S)}\n'
+            f'*Кол-во товара размера M:* {str(order.M)}\n'
+            f'*Кол-во товара размера L:* {str(order.L)}\n'
+            f'*Цвет:* {str(order.color)}\n'
+            f'*Название магазина:* {str(order.vendor_name)}\n'
+            f'*Способ отправки:* {str(order.sending_method)}\n'
+            f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
     except AttributeError:
         await callback.message.answer('Нет данных')
 
@@ -451,7 +463,8 @@ async def fact_info(callback: CallbackQuery, state: FSMContext):
             f'*------Фактические данные------*\n'
             f'*Фактическое кол-во товара размера S:* {str(order.fact_S)}, *расхождение с заказом:* {order.fact_S - order.S}\n'
             f'*Фактическое кол-во товара размера M:* {str(order.fact_M)}, *расхождение с заказом:* {order.fact_M - order.M}\n'
-            f'*Фактическое кол-во товара размера L:* {str(order.fact_L)}, *расхождение с заказом:* {order.fact_L - order.L}\n', parse_mode="Markdown")
+            f'*Фактическое кол-во товара размера L:* {str(order.fact_L)}, *расхождение с заказом:* {order.fact_L - order.L}\n',
+            parse_mode="Markdown")
     else:
         await callback.message.answer('Нет данных')
 
@@ -646,9 +659,9 @@ async def insert_image(message: Message, state: FSMContext):
                                  data['quantity_l'], data['vendor_name'], data['sending_method'], data['order_image'],
                                  data['delivery_id'], data['color'], data['vendor_internal_article'], data['date'],
                                  data['change_date'])
-        #order = await rq.get_order_test(data['order_image'])
-        #json_str = '{"name": "John", "age": 30, "city": "New York"}'
-        #await rq.set_sack_images(json_str, order.id)
+        # order = await rq.get_order_test(data['order_image'])
+        # json_str = '{"name": "John", "age": 30, "city": "New York"}'
+        # await rq.set_sack_images(json_str, order.id)
         await message.answer('Заказ создан успешно')
         await state.clear()
     except TypeError:
@@ -737,17 +750,17 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
     try:
         await callback.message.answer(
             f'*------Данные заказа------*\n'
-                 f'*Дата создания заказа:* {str(order.date)}\n'
-                 f'*Дата последнего изменения заказа:* {str(order.change_date)}\n'
-                 f'*Внутренний артикул товара:* {str(order.internal_article)}\n'
-                 f'*Внутренний артикул поставщика:* {str(order.vendor_internal_article)}\n'
-                 f'*Кол-во товара размера S:* {str(order.S)}\n'
-                 f'*Кол-во товара размера M:* {str(order.M)}\n'
-                 f'*Кол-во товара размера L:* {str(order.L)}\n'
-                 f'*Цвет:* {str(order.color)}\n'
-                 f'*Название магазина:* {str(order.vendor_name)}\n'
-                 f'*Способ отправки:* {str(order.sending_method)}\n'
-                 f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
+            f'*Дата создания заказа:* {str(order.date)}\n'
+            f'*Дата последнего изменения заказа:* {str(order.change_date)}\n'
+            f'*Внутренний артикул товара:* {str(order.internal_article)}\n'
+            f'*Внутренний артикул поставщика:* {str(order.vendor_internal_article)}\n'
+            f'*Кол-во товара размера S:* {str(order.S)}\n'
+            f'*Кол-во товара размера M:* {str(order.M)}\n'
+            f'*Кол-во товара размера L:* {str(order.L)}\n'
+            f'*Цвет:* {str(order.color)}\n'
+            f'*Название магазина:* {str(order.vendor_name)}\n'
+            f'*Способ отправки:* {str(order.sending_method)}\n'
+            f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
     except AttributeError:
         await callback.message.answer('Нет данных')
 
@@ -798,7 +811,8 @@ async def fact_info(callback: CallbackQuery, state: FSMContext):
             f'*------Фактические данные------*\n'
             f'*Фактическое кол-во товара размера S:* {str(order.fact_S)}, *расхождение с заказом:* {order.fact_S - order.S}\n'
             f'*Фактическое кол-во товара размера M:* {str(order.fact_M)}, *расхождение с заказом:* {order.fact_M - order.M}\n'
-            f'*Фактическое кол-во товара размера L:* {str(order.fact_L)}, *расхождение с заказом:* {order.fact_L - order.L}\n', parse_mode="Markdown")
+            f'*Фактическое кол-во товара размера L:* {str(order.fact_L)}, *расхождение с заказом:* {order.fact_L - order.L}\n',
+            parse_mode="Markdown")
     else:
         await callback.message.answer('Нет данных')
 
@@ -957,17 +971,17 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
     try:
         await callback.message.answer(
             f'*------Данные заказа------*\n'
-                 f'*Дата создания заказа:* {str(order.date)}\n'
-                 f'*Дата последнего изменения заказа:* {str(order.change_date)}\n'
-                 f'*Внутренний артикул товара:* {str(order.internal_article)}\n'
-                 f'*Внутренний артикул поставщика:* {str(order.vendor_internal_article)}\n'
-                 f'*Кол-во товара размера S:* {str(order.S)}\n'
-                 f'*Кол-во товара размера M:* {str(order.M)}\n'
-                 f'*Кол-во товара размера L:* {str(order.L)}\n'
-                 f'*Цвет:* {str(order.color)}\n'
-                 f'*Название магазина:* {str(order.vendor_name)}\n'
-                 f'*Способ отправки:* {str(order.sending_method)}\n'
-                 f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
+            f'*Дата создания заказа:* {str(order.date)}\n'
+            f'*Дата последнего изменения заказа:* {str(order.change_date)}\n'
+            f'*Внутренний артикул товара:* {str(order.internal_article)}\n'
+            f'*Внутренний артикул поставщика:* {str(order.vendor_internal_article)}\n'
+            f'*Кол-во товара размера S:* {str(order.S)}\n'
+            f'*Кол-во товара размера M:* {str(order.M)}\n'
+            f'*Кол-во товара размера L:* {str(order.L)}\n'
+            f'*Цвет:* {str(order.color)}\n'
+            f'*Название магазина:* {str(order.vendor_name)}\n'
+            f'*Способ отправки:* {str(order.sending_method)}\n'
+            f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
     except AttributeError:
         await callback.message.answer('Нет данных')
 
@@ -1018,7 +1032,8 @@ async def fact_info(callback: CallbackQuery, state: FSMContext):
             f'*------Фактические данные------*\n'
             f'*Фактическое кол-во товара размера S:* {str(order.fact_S)}, *расхождение с заказом:* {order.fact_S - order.S}\n'
             f'*Фактическое кол-во товара размера M:* {str(order.fact_M)}, *расхождение с заказом:* {order.fact_M - order.M}\n'
-            f'*Фактическое кол-во товара размера L:* {str(order.fact_L)}, *расхождение с заказом:* {order.fact_L - order.L}\n', parse_mode="Markdown")
+            f'*Фактическое кол-во товара размера L:* {str(order.fact_L)}, *расхождение с заказом:* {order.fact_L - order.L}\n',
+            parse_mode="Markdown")
     else:
         await callback.message.answer('Нет данных')
 
@@ -1081,4 +1096,196 @@ async def all_info(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(info_string)
 
 
+"""Редактирование данных заказа-------------------------------------------------------------------------------------"""
+
+
+@router.callback_query(F.data == 'edit_order', check_orders.select_order)
+async def edit_order_callback(callback: CallbackQuery, state: FSMContext):
+    if callback.from_user.id in senders:
+        await callback.answer()
+        data = await state.get_data()
+        await state.set_state(edit_orders.select_value)
+        await state.update_data(order_id=data['order_id'])
+        await callback.message.answer('Выберите поле для редактирования:', reply_markup=kb.choose_value)
+    else:
+        await callback.answer()
+        await callback.message.answer('У вас нет доступа к данной функции')
+
+
+@router.callback_query(F.data == 'edit_product_article', edit_orders.select_value)
+async def edit_product_article_callback(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await callback.message.answer('Введите внутренний артикул товара:')
+    await state.set_state(edit_orders.edit_product_article)
+
+
+@router.message(edit_orders.edit_product_article)
+async def edit_product_article_2(message: Message, state: FSMContext):
+    try:
+        product_article = str(message.text)
+        await state.update_data(product_article=product_article)
+        data = await state.get_data()
+        await rq.edit_order_internal_article(data['order_id'], data['product_article'])
+        await message.answer('Артикул успешно обновлен')
+        await state.set_state(edit_orders.select_value)
+    except ValueError:
+        await message.answer('Ошибка, попробуйте еще раз')
+
+
+@router.callback_query(F.data == 'edit_vendor_article', edit_orders.select_value)
+async def edit_vendor_article_1(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await state.set_state(edit_orders.edit_vendor_article)
+    await callback.message.answer('Введите внутренний артикул поставщика:', reply_markup=kb.vendor_internal_article)
+
+
+@router.message(edit_orders.edit_vendor_article)
+async def edit_vendor_article_2(message: Message, state: FSMContext):
+    try:
+        vendor_article = str(message.text)
+        await state.update_data(vendor_internal_article=vendor_article)
+        data = await state.get_data()
+        await rq.edit_order_vendor_internal_article(data['order_id'], data['vendor_internal_article'])
+        await message.answer('Артикул успешно обновлен')
+        await state.set_state(edit_orders.select_value)
+    except ValueError:
+        await message.answer('Ошибка, попробуйте еще раз')
+
+
+@router.callback_query(F.data == 'skip', edit_orders.edit_vendor_article)
+async def skip_vendor_article(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    vendor_article = 'Не заполнено'
+    await state.update_data(vendor_internal_article=vendor_article)
+    data = await state.get_data()
+    await rq.edit_order_vendor_internal_article(data['order_id'], data['vendor_internal_article'])
+    await callback.message.answer('Артикул успешно обновлен')
+    await state.set_state(edit_orders.select_value)
+
+
+@router.callback_query(F.data == 'edit_s_quantity', edit_orders.select_value)
+async def edit_s_quantity_1(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await state.set_state(edit_orders.edit_s_quantity)
+    await callback.message.answer('Введите кол-во товара размера S:')
+
+
+@router.message(edit_orders.edit_s_quantity)
+async def edit_s_quantity_2(message: Message, state: FSMContext):
+    try:
+        quantity_s = int(message.text)
+        if quantity_s >= 0:
+            await state.update_data(quantity_s=quantity_s)
+            data = await state.get_data()
+            await rq.edit_order_s(data['order_id'], data['quantity_s'])
+            await message.answer('Кол-во товара S успешно обновлено')
+            await state.set_state(edit_orders.select_value)
+        else:
+            await message.answer('Значение не может быть меньше 0')
+    except ValueError:
+        await message.answer('Ошибка, попробуйте еще раз')
+
+
+@router.callback_query(F.data == 'edit_m_quantity', edit_orders.select_value)
+async def edit_m_quantity_1(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await state.set_state(edit_orders.edit_m_quantity)
+    await callback.message.answer('Введите кол-во товара размера M:')
+
+
+@router.message(edit_orders.edit_m_quantity)
+async def edit_m_quantity_2(message: Message, state: FSMContext):
+    try:
+        quantity_m = int(message.text)
+        if quantity_m >= 0:
+            await state.update_data(quantity_m=quantity_m)
+            data = await state.get_data()
+            await rq.edit_order_m(data['order_id'], data['quantity_m'])
+            await message.answer('Кол-во товара M успешно обновлено')
+            await state.set_state(edit_orders.select_value)
+        else:
+            await message.answer('Значение не может быть меньше 0')
+    except ValueError:
+        await message.answer('Ошибка, попробуйте еще раз')
+
+
+@router.callback_query(F.data == 'edit_l_quantity', edit_orders.select_value)
+async def edit_l_quantity_1(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await state.set_state(edit_orders.edit_l_quantity)
+    await callback.message.answer('Введите кол-во товара размера L:')
+
+
+@router.message(edit_orders.edit_l_quantity)
+async def edit_l_quantity_2(message: Message, state: FSMContext):
+    try:
+        quantity_l = int(message.text)
+        if quantity_l >= 0:
+            await state.update_data(quantity_l=quantity_l)
+            data = await state.get_data()
+            await rq.edit_order_l(data['order_id'], data['quantity_l'])
+            await message.answer('Кол-во товара L успешно обновлено')
+            await state.set_state(edit_orders.select_value)
+        else:
+            await message.answer('Значение не может быть меньше 0')
+    except ValueError:
+        await message.answer('Ошибка, попробуйте еще раз')
+
+
+@router.callback_query(F.data == 'edit_color', edit_orders.select_value)
+async def edit_color_1(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await state.set_state(edit_orders.edit_color)
+    await callback.message.answer('Введите цвет:')
+
+
+@router.message(edit_orders.edit_color)
+async def edit_color_2(message: Message, state: FSMContext):
+    try:
+        color = str(message.text)
+        await state.update_data(color=color)
+        data = await state.get_data()
+        await rq.edit_order_color(data['order_id'], data['color'])
+        await message.answer('Цвет успешно обновлен')
+        await state.set_state(edit_orders.select_value)
+    except ValueError:
+        await message.answer('Ошибка, попробуйте еще раз')
+
+
+@router.callback_query(F.data == 'edit_name', edit_orders.select_value)
+async def edit_order_vendor_name_1(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await state.set_state(edit_orders.edit_name)
+    await callback.message.answer('Введите название магазина:')
+
+
+@router.message(edit_orders.edit_name)
+async def edit_order_vendor_name_2(message: Message, state: FSMContext):
+    try:
+        name = str(message.text)
+        await state.update_data(name=name)
+        data = await state.get_data()
+        await rq.edit_order_name(data['order_id'], data['name'])
+        await message.answer('Название магазина успешно обновлено')
+        await state.set_state(edit_orders.select_value)
+    except ValueError:
+        await message.answer('Ошибка, попробуйте еще раз')
+
+
+@router.callback_query(F.data == 'edit_sending_method', edit_orders.select_value)
+async def edit_order_vendor_name_1(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await state.set_state(edit_orders.edit_sending_method)
+    await callback.message.answer('Выберите тип отправки:', reply_markup=await kb.inline_sending_method())
+
+
+@router.callback_query(F.data.startswith('method_'), edit_orders.edit_sending_method)
+async def choose_sending_method(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    sending_method = str(callback.data)
+    await state.update_data(sending_method=sending_method[7:])
+    data = await state.get_data()
+    await rq.edit_order_sending_method(data['order_id'], data['sending_method'])
+    await callback.message.answer('Способ отправки успешно изменен')
+    await state.set_state(edit_orders.select_value)
 """-----------------------------------------------------------------------------------------------------------------"""
