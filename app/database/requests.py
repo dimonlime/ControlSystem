@@ -219,6 +219,12 @@ async def get_orders_by_article(internal_article):
         return orders
 
 
+async def get_orders_by_income_id(income_id):
+    async with async_session() as session:
+        orders = await session.scalars(select(Order).where(Order.delivery_id == income_id))
+        return orders
+
+
 async def get_delivery_date_by_del_id(delivery_id):
     async with async_session() as session:
         order = await session.scalar(select(Order).where(Order.delivery_id == delivery_id))

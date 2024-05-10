@@ -63,7 +63,7 @@ async def pay_cheques(callback: CallbackQuery, state: FSMContext):
         f'*Кол-во дней до оплаты:* {days_left.days}\n', parse_mode="Markdown"))
         media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
         await callback.message.answer_media_group(media=media_list)
-        await callback.message.answer('Выберите действие', reply_markup=static_kb.select_cheque)
+        await callback.message.answer('Выберите действие:', reply_markup=static_kb.select_cheque)
     elif order.fish is not None and cheque.payment_image is None:
         cheque_date_datetime = datetime.strptime(cheque.cheque_date, "%d-%m-%Y %H:%M")
         time_now = datetime.now()
@@ -81,13 +81,13 @@ async def pay_cheques(callback: CallbackQuery, state: FSMContext):
         media_list.append(InputMediaPhoto(media=cheque.payment_image))
         media_list.append(InputMediaPhoto(media=fish.fish_image_id))
         await callback.message.answer_media_group(media=media_list)
-        await callback.message.answer('Вывести информацию:', reply_markup=static_kb.view_info)
+        await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
     elif cheque.payment_image is not None:
         media_list.append(InputMediaPhoto(media=order.order_image_id))
         media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
         media_list.append(InputMediaPhoto(media=cheque.payment_image))
         await callback.message.answer_media_group(media=media_list)
-        await callback.message.answer('Вывести информацию:', reply_markup=static_kb.view_info)
+        await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
 
 
 @router.callback_query(F.data == 'order_info', change_cheque_status.select_cheque)

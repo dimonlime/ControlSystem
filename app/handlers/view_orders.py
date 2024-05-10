@@ -12,6 +12,8 @@ router = Router()
 
 class check_orders(StatesGroup):
     select_order = State()
+    select_status = State()
+    get_order = State()
 
 
 """Просмотр заказов-------------------------------------------------------------------------------------------------"""
@@ -27,13 +29,31 @@ async def check_all_orders(message: Message, state: FSMContext):
 @router.callback_query(F.data.startswith('income_all_'))
 async def check_income_order(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
+    await state.set_state(check_orders.select_status)
     income_id = str(callback.data)[11:]
     income_id = int(income_id)
-    await callback.message.answer('Выберите заказ:', reply_markup=await async_kb.inline_all_orders_send(income_id))
+    await state.update_data(income_id=income_id)
+    await callback.message.answer('Выберите статус заказа:', reply_markup=await async_kb.inline_all_orders_status(income_id))
+
+
+@router.callback_query(F.data.startswith('order_status_'), check_orders.select_status)
+async def check_income_order(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    order_status = str(callback.data)[13:]
+    await state.update_data(order_status=order_status)
+    data = await state.get_data()
+    await callback.message.answer(f'Выберите заказ({order_status}):', reply_markup=await async_kb.inline_all_orders_by_status(data['income_id'], data['order_status']))
+
+
+@router.callback_query(F.data.startswith('orders_all'), check_orders.select_status)
+async def check_income_order(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    data = await state.get_data()
+    await callback.message.answer('Выберите заказ:', reply_markup=await async_kb.inline_all_orders_send(data['income_id']))
 
 
 @router.callback_query(F.data.startswith('get_info_'))
-async def get_all_cheques(callback: CallbackQuery, state: FSMContext):
+async def get_all_orders(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await state.set_state(check_orders.select_order)
     order_id = str(callback.data)[9:]
@@ -45,20 +65,20 @@ async def get_all_cheques(callback: CallbackQuery, state: FSMContext):
     if order.cheque_image_id is None and order.fish is None:
         media_list.append(InputMediaPhoto(media=order.order_image_id))
         await callback.message.answer_media_group(media=media_list)
-        await callback.message.answer('Вывести информацию:', reply_markup=static_kb.view_info)
+        await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
     elif cheque.cheque_image_id is not None and order.fish is None and cheque.payment_image is None:
         await state.update_data(cheque_id=cheque.id)
         media_list.append(InputMediaPhoto(media=order.order_image_id))
         media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
         await callback.message.answer_media_group(media=media_list)
-        await callback.message.answer('Вывести информацию:', reply_markup=static_kb.view_info)
+        await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
     elif cheque.payment_image is not None and order.fish is None and cheque.cheque_image_id is not None:
         await state.update_data(cheque_id=cheque.id)
         media_list.append(InputMediaPhoto(media=order.order_image_id))
         media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
         media_list.append(InputMediaPhoto(media=cheque.payment_image))
         await callback.message.answer_media_group(media=media_list)
-        await callback.message.answer('Вывести информацию:', reply_markup=static_kb.view_info)
+        await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
     elif order.cheque_image_id is not None and cheque.payment_image is not None and order.fish is not None:
         await state.update_data(cheque_id=cheque.id)
         media_list.append(InputMediaPhoto(media=order.order_image_id))
@@ -66,14 +86,14 @@ async def get_all_cheques(callback: CallbackQuery, state: FSMContext):
         media_list.append(InputMediaPhoto(media=cheque.payment_image))
         media_list.append(InputMediaPhoto(media=fish.fish_image_id))
         await callback.message.answer_media_group(media=media_list)
-        await callback.message.answer('Вывести информацию:', reply_markup=static_kb.view_info)
+        await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
     elif order.cheque_image_id is not None and cheque.payment_image is None and order.fish is not None:
         await state.update_data(cheque_id=cheque.id)
         media_list.append(InputMediaPhoto(media=order.order_image_id))
         media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
         media_list.append(InputMediaPhoto(media=fish.fish_image_id))
         await callback.message.answer_media_group(media=media_list)
-        await callback.message.answer('Вывести информацию:', reply_markup=static_kb.view_info)
+        await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
 
 
 @router.callback_query(F.data == 'order_info', check_orders.select_order)

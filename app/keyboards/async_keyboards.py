@@ -116,6 +116,38 @@ async def inline_all_orders_send(income_id):
     return keyboard.adjust(1).as_markup()
 
 
+async def inline_all_orders_by_status(income_id, order_status):
+    keyboard = InlineKeyboardBuilder()
+    data = await rq.get_orders_by_income_id(income_id)
+    for order in data:
+        today_date = datetime.now()
+        half_year = today_date - timedelta(days=365 / 2)
+        order_date = datetime.strptime(order.date, "%d-%m-%Y %H:%M:%S")
+        if half_year <= order_date <= today_date:
+            if order.delivery_id == income_id and order.order_status == order_status:
+                keyboard.add(InlineKeyboardButton(text=f'Арт: "{order.internal_article}"; Дата: "{order.date}"',
+                                                  callback_data=f'get_info_{order.id}'))
+    return keyboard.adjust(1).as_markup()
+
+
+async def inline_all_orders_status(income_id):
+    keyboard = InlineKeyboardBuilder()
+    data = await rq.get_orders_by_income_id(income_id)
+    status = []
+    keyboard.add(InlineKeyboardButton(text=f'Все заказы',
+                                      callback_data=f'orders_all'))
+    for order in data:
+        today_date = datetime.now()
+        half_year = today_date - timedelta(days=365 / 2)
+        order_date = datetime.strptime(order.date, "%d-%m-%Y %H:%M:%S")
+        if half_year <= order_date <= today_date:
+            if order.order_status not in status:
+                status.append(order.order_status)
+                keyboard.add(InlineKeyboardButton(text=f'{order.order_status}',
+                                                  callback_data=f'order_status_{order.order_status}'))
+    return keyboard.adjust(1).as_markup()
+
+
 async def all_incomes():
     keyboard = InlineKeyboardBuilder()
     data = await rq.all_orders()
