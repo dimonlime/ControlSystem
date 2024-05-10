@@ -21,6 +21,7 @@ class create_order_state(StatesGroup):
     insert_sending_method = State()
     insert_order_image_id = State()
     insert_delivery_id = State()
+    insert_delivery_date = State()
     insert_color = State()
     insert_vendor_internal_article = State()
 
@@ -32,7 +33,7 @@ class create_order_state(StatesGroup):
 async def create_order(message: Message, state: FSMContext):
     if message.from_user.id in senders:
         await state.set_state(create_order_state.insert_delivery_id)
-        await message.answer('Введите ID поставки к которой относится заказ:')
+        await message.answer('Введите ID поставки к которой относится заказ, либо выберите существующую:', reply_markup= await async_kb.all_incomes())
 
 
 @router.message(create_order_state.insert_delivery_id)
@@ -41,12 +42,52 @@ async def insert_delivery_id(message: Message, state: FSMContext):
         delivery_id = int(message.text)
         if delivery_id > 0:
             await state.update_data(delivery_id=delivery_id)
-            await state.set_state(create_order_state.insert_internal_article)
-            await message.answer('Введите внутренний артикул товара:')
+            await state.set_state(create_order_state.insert_delivery_date)
+            await message.answer(f'Введите дату поставки, либо оставьте текующую({datetime.now().strftime("%d-%m-%Y")})'
+                                 f', пример: 04-04-2024', reply_markup=static_kb.delivery_date)
         else:
             await message.answer('ID поставки не может быть меньше нуля...')
     except ValueError:
         await message.answer('Ошибка, попробуйте еще раз')
+
+
+@router.callback_query(F.data.startswith('income_all_'), create_order_state.insert_delivery_id)
+async def check_income_order(callback: CallbackQuery, state: FSMContext):
+    try:
+        await callback.answer()
+        delivery_id_raw = str(callback.data)[11:]
+        delivery_id = int(delivery_id_raw)
+        delivery_date = await rq.get_delivery_date_by_del_id(delivery_id)
+        await state.update_data(delivery_id=delivery_id)
+        await state.update_data(delivery_date=delivery_date)
+        await state.set_state(create_order_state.insert_internal_article)
+        await callback.message.answer('Введите внутренний артикул товара:')
+    except ValueError:
+        await callback.message.answer('Ошибка, попробуйте еще раз')
+
+
+@router.message(create_order_state.insert_delivery_date)
+async def insert_delivery_id(message: Message, state: FSMContext):
+    try:
+        delivery_date = str(message.text)
+        delivery_date_time = datetime.strptime(delivery_date, "%d-%m-%Y")
+        await state.update_data(delivery_date=delivery_date)
+        await state.set_state(create_order_state.insert_internal_article)
+        await message.answer('Введите внутренний артикул товара:')
+    except ValueError:
+        await message.answer('Ошибка, попробуйте еще раз')
+
+
+@router.callback_query(F.data == 'today_date', create_order_state.insert_delivery_date)
+async def check_income_order(callback: CallbackQuery, state: FSMContext):
+    try:
+        await callback.answer()
+        delivery_date = datetime.now().strftime("%d-%m-%Y")
+        await state.update_data(delivery_date=delivery_date)
+        await state.set_state(create_order_state.insert_internal_article)
+        await callback.message.answer('Введите внутренний артикул товара:')
+    except ValueError:
+        await callback.message.answer('Ошибка, попробуйте еще раз')
 
 
 @router.message(create_order_state.insert_internal_article)
@@ -156,7 +197,7 @@ async def insert_image(message: Message, state: FSMContext):
         await rq.create_order_db(data['internal_article'], data['quantity_s'], data['quantity_m'],
                                  data['quantity_l'], data['vendor_name'], data['sending_method'], data['order_image'],
                                  data['delivery_id'], data['color'], data['vendor_internal_article'], data['date'],
-                                 data['change_date'])
+                                 data['change_date'], data['delivery_date'])
         # order = await rq.get_order_test(data['order_image'])
         # json_str = '{"name": "John", "age": 30, "city": "New York"}'
         # await rq.set_sack_images(json_str, order.id)
@@ -164,8 +205,3 @@ async def insert_image(message: Message, state: FSMContext):
         await state.clear()
     except TypeError:
         await message.answer('Ошибка, попробуйте еще раз')
-
-
-
-
-

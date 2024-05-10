@@ -14,12 +14,19 @@ recipient_keyboard = ReplyKeyboardMarkup(keyboard=[
 sender_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Создать заказ')],
     [KeyboardButton(text='Просмотреть чеки')],
-    [KeyboardButton(text='Посмотреть заказы')]
+    [KeyboardButton(text='Посмотреть заказы')],
+    [KeyboardButton(text='Информация по артикулам')]
 ], resize_keyboard=True)
 
 vendor_internal_article = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Пропустить', callback_data='skip')]
 ])
+
+
+delivery_date = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='Оставить текущую дату', callback_data='today_date')]
+])
+
 
 cheques_category = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Все чеки', callback_data='all_chques')],

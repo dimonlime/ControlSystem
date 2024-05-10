@@ -6,7 +6,7 @@ import dotenv
 import sys
 import logging
 from app.handlers import (handlers, edit_order, change_status, fact_data, create_fish, checking_cheques, create_order,
-                          pay_cheques, view_orders)
+                          pay_cheques, view_orders, article_info)
 from app.database.models import async_main
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from app.time_update import fire_cheques_check
@@ -19,7 +19,7 @@ async def main():
     await async_main()
     dp.include_routers(handlers.router, edit_order.router, change_status.router, fact_data.router,
                        create_fish.router, checking_cheques.router, create_order.router, pay_cheques.router,
-                       view_orders.router)
+                       view_orders.router, article_info.router)
     dotenv.load_dotenv()
     scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
     scheduler.add_job(fire_cheques_check, "interval", hours=1)
