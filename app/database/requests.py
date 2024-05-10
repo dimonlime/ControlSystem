@@ -1,5 +1,4 @@
 from sqlalchemy.exc import IntegrityError
-
 from app.database.models import async_session
 from app.database.models import Cheque, Order, Fish
 from sqlalchemy import select
@@ -25,12 +24,12 @@ async def create_cheque_db(vendor_name, price, image, order_id, cheque_date, che
 
 
 async def create_order_db(internal_article, s, m, l, vendor_name, sending_method, image_id, delivery_id, color,
-                          vendor_internal_article, date, change_date):
+                          vendor_internal_article, date, change_date, delivery_date):
     async with async_session() as session:
         session.add(Order(internal_article=internal_article, S=s, M=m, L=l, vendor_name=vendor_name,
                           sending_method=sending_method, order_image_id=image_id, delivery_id=delivery_id,
                           color=color, vendor_internal_article=vendor_internal_article, date=date,
-                          change_date=change_date))
+                          change_date=change_date, delivery_date=delivery_date))
         await session.commit()
 
 
@@ -212,3 +211,16 @@ async def edit_order_sending_method(order_id, sending_method):
 
 
 """-----------------------------------------------------------------------------------------------------------------"""
+
+
+async def get_orders_by_article(internal_article):
+    async with async_session() as session:
+        orders = await session.scalars(select(Order).where(Order.internal_article == internal_article))
+        return orders
+
+
+async def get_delivery_date_by_del_id(delivery_id):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.delivery_id == delivery_id))
+        delivery_date = order.delivery_date
+        return delivery_date

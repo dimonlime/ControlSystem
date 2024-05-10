@@ -18,6 +18,7 @@ class Order(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     delivery_id: Mapped[int] = mapped_column(nullable=True, default=None)
+    delivery_date: Mapped[datetime] = mapped_column(String(25))
     date: Mapped[datetime] = mapped_column(String(25))
     change_date: Mapped[datetime] = mapped_column(String(25))
     internal_article: Mapped[str] = mapped_column(String(25), nullable=True, default=None)

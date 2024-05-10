@@ -127,9 +127,8 @@ async def all_incomes():
         if half_year <= order_date <= today_date:
             if order.delivery_id not in incomes:
                 incomes.append(order.delivery_id)
-    for income in incomes:
-        keyboard.add(InlineKeyboardButton(text=f'ID Поставки: {income}',
-                                          callback_data=f'income_all_{income}'))
+                keyboard.add(InlineKeyboardButton(text=f'ID: {order.delivery_id} Дата: {order.delivery_date}',
+                                                  callback_data=f'income_all_{order.delivery_id}'))
     return keyboard.adjust(1).as_markup()
 
 
@@ -144,7 +143,23 @@ async def all_incomes_recipients():
         if half_year <= order_date <= today_date:
             if order.delivery_id not in incomes:
                 incomes.append(order.delivery_id)
-    for income in incomes:
-        keyboard.add(InlineKeyboardButton(text=f'ID Поставки: {income}',
-                                          callback_data=f'income_rec{income}'))
+                keyboard.add(InlineKeyboardButton(text=f'ID: {order.delivery_id} Дата: {order.delivery_date}',
+                                                  callback_data=f'income_rec{order.delivery_id}'))
+    return keyboard.adjust(1).as_markup()
+
+
+async def all_articles():
+    keyboard = InlineKeyboardBuilder()
+    data = await rq.all_orders()
+    articles = []
+    for order in data:
+        today_date = datetime.now()
+        half_year = today_date - timedelta(days=365 / 2)
+        order_date = datetime.strptime(order.date, "%d-%m-%Y %H:%M:%S")
+        if half_year <= order_date <= today_date:
+            if order.internal_article not in articles:
+                articles.append(order.internal_article)
+    for article in articles:
+        keyboard.add(InlineKeyboardButton(text=f'Артикул: {article}',
+                                          callback_data=f'article_{article}'))
     return keyboard.adjust(1).as_markup()

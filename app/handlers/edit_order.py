@@ -22,17 +22,25 @@ class edit_orders(StatesGroup):
     edit_sending_method = State()
 
 
+class check_orders(StatesGroup):
+    select_order = State()
+
+
 """Редактирование данных заказа-------------------------------------------------------------------------------------"""
 
 
 @router.callback_query(F.data == 'edit_order')
 async def edit_order_callback(callback: CallbackQuery, state: FSMContext):
-    if callback.from_user.id in senders:
+    if callback.from_user.id in senders and await state.get_state() == check_orders.select_order:
         await callback.answer()
         data = await state.get_data()
-        await state.set_state(edit_orders.select_value)
-        await state.update_data(order_id=data['order_id'])
-        await callback.message.answer('Выберите поле для редактирования:', reply_markup=static_kb.choose_value)
+        order = await rq.get_order(data['order_id'])
+        if order.order_status == 'Заказ создан':
+            await state.set_state(edit_orders.select_value)
+            await state.update_data(order_id=data['order_id'])
+            await callback.message.answer('Выберите поле для редактирования:', reply_markup=static_kb.choose_value)
+        else:
+            await callback.message.answer(f'Нельзя редактировать заказ, статус "{order.order_status}"')
     else:
         await callback.answer()
         await callback.message.answer('У вас нет доступа к данной функции')
@@ -62,7 +70,8 @@ async def edit_product_article_2(message: Message, state: FSMContext):
 async def edit_vendor_article_1(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await state.set_state(edit_orders.edit_vendor_article)
-    await callback.message.answer('Введите внутренний артикул поставщика:', reply_markup=static_kb.vendor_internal_article)
+    await callback.message.answer('Введите внутренний артикул поставщика:',
+                                  reply_markup=static_kb.vendor_internal_article)
 
 
 @router.message(edit_orders.edit_vendor_article)
