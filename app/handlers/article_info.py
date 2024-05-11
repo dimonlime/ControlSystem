@@ -28,8 +28,7 @@ async def view_articles(message: Message, state: FSMContext):
 async def get_article_info(callback: CallbackQuery, state: FSMContext):
     try:
         await callback.answer()
-        raw_article = str(callback.data)[8:]
-        article = int(raw_article)
+        article = str(callback.data)[8:]
         orders = await rq.get_orders_by_article(article)
         sum_all = 0
         sum_s_all = 0
