@@ -8,12 +8,9 @@ from app.keyboards import async_keyboards as async_kb
 from app.keyboards import static_keyboards as static_kb
 from app.database import requests as rq
 
+from app.states.change_cheque_status import change_cheque_status
 
 router = Router()
-
-class change_cheque_status(StatesGroup):
-    select_cheque = State()
-    attach_pay_screen = State()
 
 
 """Просмотр чеков + оплата------------------------------------------------------------------------------------------"""
@@ -247,9 +244,3 @@ async def insert_payment_image(message: Message, state: FSMContext):
         await state.clear()
     except TypeError:
         await message.answer('Ошибка, попробуйте еще раз')
-
-
-
-
-
-

@@ -14,8 +14,14 @@ recipient_keyboard = ReplyKeyboardMarkup(keyboard=[
 sender_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Создать заказ')],
     [KeyboardButton(text='Просмотреть чеки')],
-    [KeyboardButton(text='Посмотреть заказы')],
+    [KeyboardButton(text='Заказы')],
     [KeyboardButton(text='Информация по артикулам')]
+], resize_keyboard=True)
+
+orders_keyboard = ReplyKeyboardMarkup(keyboard=[
+    [KeyboardButton(text='Посмотреть заказы')],
+    [KeyboardButton(text='Изменить статус заказов')],
+    [KeyboardButton(text='Назад')],
 ], resize_keyboard=True)
 
 vendor_internal_article = InlineKeyboardMarkup(inline_keyboard=[

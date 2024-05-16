@@ -7,11 +7,9 @@ from app.keyboards import async_keyboards as async_kb
 from app.keyboards import static_keyboards as static_kb
 from app.database import requests as rq
 
+from app.states.check_article import check_articles
+
 router = Router()
-
-
-class check_articles(StatesGroup):
-    select_article = State()
 
 
 """Создание заказа--------------------------------------------------------------------------------------------------"""
@@ -55,6 +53,21 @@ async def get_article_info(callback: CallbackQuery, state: FSMContext):
         sum_m_log = 0
         sum_l_log = 0
 
+        sum_msk = 0
+        sum_s_msk = 0
+        sum_m_msk = 0
+        sum_l_msk = 0
+
+        sum_warehouse = 0
+        sum_s_warehouse = 0
+        sum_m_warehouse = 0
+        sum_l_warehouse = 0
+
+        sum_wb_send = 0
+        sum_s_wb_send = 0
+        sum_m_wb_send = 0
+        sum_l_wb_send = 0
+
         for order in orders:
             sum_all += order.S + order.M + order.L
             sum_s_all += order.S
@@ -80,6 +93,21 @@ async def get_article_info(callback: CallbackQuery, state: FSMContext):
                 sum_s_log += order.S
                 sum_m_log += order.M
                 sum_l_log += order.L
+            if order.order_status == 'Пришел в Москву':
+                sum_msk += order.S + order.M + order.L
+                sum_s_msk += order.S
+                sum_m_msk += order.M
+                sum_l_msk += order.L
+            if order.order_status == 'Принято на складе подрядчика':
+                sum_warehouse += order.S + order.M + order.L
+                sum_s_warehouse += order.S
+                sum_m_warehouse += order.M
+                sum_l_warehouse += order.L
+            if order.order_status == 'Отправлено на склад WB':
+                sum_wb_send += order.S + order.M + order.L
+                sum_s_wb_send += order.S
+                sum_m_wb_send += order.M
+                sum_l_wb_send += order.L
 
         await callback.message.answer(f'Артикул: {article}\n'
                                       f'Общее кол-во товара: {sum_all}\n'
@@ -106,6 +134,21 @@ async def get_article_info(callback: CallbackQuery, state: FSMContext):
                                       f'Кол-во товара размера S: {sum_s_log}\n'
                                       f'Кол-во товара размера M: {sum_m_log}\n'
                                       f'Кол-во товара размера L: {sum_l_log}\n'
+                                      f'-------"Пришел в Москву"-------\n'
+                                      f'Общее кол-во товара: {sum_msk}\n'
+                                      f'Кол-во товара размера S: {sum_s_msk}\n'
+                                      f'Кол-во товара размера M: {sum_m_msk}\n'
+                                      f'Кол-во товара размера L: {sum_l_msk}\n'
+                                      f'-------"Принято на складе подрядчика"-------\n'
+                                      f'Общее кол-во товара: {sum_warehouse}\n'
+                                      f'Кол-во товара размера S: {sum_s_warehouse}\n'
+                                      f'Кол-во товара размера M: {sum_m_warehouse}\n'
+                                      f'Кол-во товара размера L: {sum_l_warehouse}\n'
+                                      f'-------"Отправлено на склад WB"-------\n'
+                                      f'Общее кол-во товара: {sum_wb_send}\n'
+                                      f'Кол-во товара размера S: {sum_s_wb_send}\n'
+                                      f'Кол-во товара размера M: {sum_m_wb_send}\n'
+                                      f'Кол-во товара размера L: {sum_l_wb_send}\n'
                                       )
     except ValueError:
         await callback.message.answer('Ошибка, попробуйте еще раз')

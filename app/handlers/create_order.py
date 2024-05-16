@@ -1,29 +1,15 @@
 from datetime import datetime
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from app.id_config import senders
 from app.keyboards import async_keyboards as async_kb
 from app.keyboards import static_keyboards as static_kb
 from app.database import requests as rq
 
+from app.states.create_order import create_order_state
+
 router = Router()
-
-
-class create_order_state(StatesGroup):
-    insert_internal_article = State()
-    insert_date_order = State()
-    insert_s_order = State()
-    insert_m_order = State()
-    insert_l_order = State()
-    insert_vendor_order = State()
-    insert_sending_method = State()
-    insert_order_image_id = State()
-    insert_delivery_id = State()
-    insert_delivery_date = State()
-    insert_color = State()
-    insert_vendor_internal_article = State()
 
 
 """Создание заказа--------------------------------------------------------------------------------------------------"""
@@ -33,7 +19,8 @@ class create_order_state(StatesGroup):
 async def create_order(message: Message, state: FSMContext):
     if message.from_user.id in senders:
         await state.set_state(create_order_state.insert_delivery_id)
-        await message.answer('Введите ID поставки к которой относится заказ, либо выберите существующую:', reply_markup= await async_kb.all_incomes())
+        await message.answer('Введите ID поставки к которой относится заказ, либо выберите существующую:',
+                             reply_markup=await async_kb.all_incomes())
 
 
 @router.message(create_order_state.insert_delivery_id)
@@ -202,6 +189,9 @@ async def insert_image(message: Message, state: FSMContext):
         # json_str = '{"name": "John", "age": 30, "city": "New York"}'
         # await rq.set_sack_images(json_str, order.id)
         await message.answer('Заказ создан успешно')
+        for chat_id in senders:
+            await message.bot.send_message(chat_id, f'Создан заказ\n'
+                                                    f'Артикул {data['internal_article']}\n')
         await state.clear()
     except TypeError:
         await message.answer('Ошибка, попробуйте еще раз')

@@ -1,18 +1,14 @@
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message, InputMediaPhoto
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from app.id_config import recipients
 from app.keyboards import async_keyboards as async_kb
 from app.keyboards import static_keyboards as static_kb
 from app.database import requests as rq
 
+from app.states.change_cheque_status import change_cheque_status
+
 router = Router()
-
-
-class change_cheque_status(StatesGroup):
-    select_cheque = State()
-    attach_pay_screen = State()
 
 
 """Проверка чеков---------------------------------------------------------------------------------------------------"""

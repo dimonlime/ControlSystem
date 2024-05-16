@@ -1,18 +1,11 @@
 from aiogram import Router
 from aiogram.types import Message
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from app.database import requests as rq
 
+from app.states.create_cheque import create_cheque_state
+
 router = Router()
-
-
-class create_cheque_state(StatesGroup):
-    insert_fact_s = State()
-    insert_fact_m = State()
-    insert_fact_l = State()
-
-    insert_fish = State()
 
 
 """Заполнение фактических данных + переход на заполнение fish-------------------------------------------------------"""

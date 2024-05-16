@@ -1,25 +1,14 @@
 from datetime import datetime
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from app.id_config import recipients
 from app.keyboards import async_keyboards as async_kb
 from app.database import requests as rq
 
+from app.states.create_cheque import create_cheque_state
+
 router = Router()
-
-
-class create_cheque_state(StatesGroup):
-    select_order = State()
-    select_status = State()
-    insert_date_cheque = State()
-    insert_price_cheque = State()
-    insert_image_cheque = State()
-    insert_cheque_number = State()
-    insert_vendor_article = State()
-
-    insert_fact_s = State()
 
 
 """Обработчик изменения статуса + чек-------------------------------------------------------------------------------"""

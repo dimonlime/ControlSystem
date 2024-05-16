@@ -1,22 +1,12 @@
 from datetime import datetime
 from aiogram import Router
 from aiogram.types import Message
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from app.database import requests as rq
 
+from app.states.create_cheque import create_cheque_state
+
 router = Router()
-
-
-class create_cheque_state(StatesGroup):
-    insert_fish = State()
-    insert_fish_date = State()
-    insert_fish_weight = State()
-    insert_sack_count = State()
-    insert_fish_image_id = State()
-
-
-
 
 """Создание fish----------------------------------------------------------------------------------------------------"""
 
@@ -85,6 +75,3 @@ async def insert_fish_image(message: Message, state: FSMContext):
         await state.clear()
     except TypeError:
         await message.answer('Ошибка, попробуйте еще раз')
-
-
-

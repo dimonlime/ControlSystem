@@ -7,23 +7,10 @@ from app.keyboards import async_keyboards as async_kb
 from app.keyboards import static_keyboards as static_kb
 from app.database import requests as rq
 
+from app.states.edit_order import edit_orders
+from app.states.check_order import check_orders
+
 router = Router()
-
-
-class edit_orders(StatesGroup):
-    select_value = State()
-    edit_product_article = State()
-    edit_vendor_article = State()
-    edit_s_quantity = State()
-    edit_m_quantity = State()
-    edit_l_quantity = State()
-    edit_color = State()
-    edit_name = State()
-    edit_sending_method = State()
-
-
-class check_orders(StatesGroup):
-    select_order = State()
 
 
 """Редактирование данных заказа-------------------------------------------------------------------------------------"""
