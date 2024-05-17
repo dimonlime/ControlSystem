@@ -1,9 +1,10 @@
 from aiogram import Router, F
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from app.id_config import senders, recipients
 from app.keyboards import static_keyboards as static_kb
+from app.states.add_article import create_article
 
 router = Router()
 
@@ -20,6 +21,18 @@ async def start(message: Message, state: FSMContext):
         await message.answer(
             f'{message.from_user.first_name} добро пожаловать, вы авторизованы как принимающая сторона',
             reply_markup=static_kb.recipient_keyboard)
+
+
+@router.message(Command(commands='add_article'))
+async def start(message: Message, state: FSMContext):
+    if message.from_user.id in senders:
+        await state.clear()
+        await message.answer(
+            f'Меню добавления артикулов',
+            reply_markup=static_kb.add_article_keyboard)
+    else:
+        await state.clear()
+        await message.answer('У вас нет доступа к этой функции')
 
 
 @router.message(F.text == 'Заказы')

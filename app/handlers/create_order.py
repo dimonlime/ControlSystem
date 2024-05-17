@@ -1,11 +1,12 @@
 from datetime import datetime
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, InputMediaPhoto
 from aiogram.fsm.context import FSMContext
 from app.id_config import senders
 from app.keyboards import async_keyboards as async_kb
 from app.keyboards import static_keyboards as static_kb
 from app.database import requests as rq
+from app.utils.utils import check_article_image
 
 from app.states.create_order import create_order_state
 
@@ -168,8 +169,42 @@ async def choose_sending_method(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     sending_method = str(callback.data)
     await state.update_data(sending_method=sending_method[7:])
-    await callback.message.answer('Прикрепите фотографию товара:')
-    await state.set_state(create_order_state.insert_order_image_id)
+    data = await state.get_data()
+    order_image = await check_article_image(data['internal_article'])
+    if order_image is not None:
+        await state.update_data(order_image=order_image)
+        await state.set_state(create_order_state.create_order)
+        await insert_image_auto(callback.message, state)
+    else:
+        await callback.message.answer('Прикрепите фотографию товара:')
+        await state.set_state(create_order_state.insert_order_image_id)
+
+
+@router.message(create_order_state.create_order)
+async def insert_image_auto(message: Message, state: FSMContext):
+    date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    change_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    await state.update_data(date=date)
+    await state.update_data(change_date=change_date)
+    data = await state.get_data()
+    await rq.create_order_db(data['internal_article'], data['quantity_s'], data['quantity_m'],
+                             data['quantity_l'], data['vendor_name'], data['sending_method'], data['order_image'],
+                             data['delivery_id'], data['color'], data['vendor_internal_article'], data['date'],
+                             data['change_date'], data['delivery_date'])
+    # order = await rq.get_order_test(data['order_image'])
+    # json_str = '{"name": "John", "age": 30, "city": "New York"}'
+    # await rq.set_sack_images(json_str, order.id)
+    await message.answer('Заказ создан успешно')
+    for chat_id in senders:
+        if chat_id != message.chat.id:
+            media_list = [InputMediaPhoto(media=data['order_image'], caption=f'🔴Оповещение о создании заказа🔴\n'
+                                                                             f'Артикул: {data['internal_article']}\n'
+                                                                             f'Дата создания заказа: {data['date']}\n'
+                                                                             f'Кол-во товара S: {data['quantity_s']}\n'
+                                                                             f'Кол-во товара M: {data['quantity_m']}\n'
+                                                                             f'Кол-во товара L: {data['quantity_l']}\n')]
+            await message.bot.send_media_group(media=media_list, chat_id=chat_id)
+    await state.clear()
 
 
 @router.message(create_order_state.insert_order_image_id)
@@ -181,6 +216,7 @@ async def insert_image(message: Message, state: FSMContext):
         await state.update_data(date=date)
         await state.update_data(change_date=change_date)
         data = await state.get_data()
+        await rq.create_article(data['internal_article'], data['order_image'])
         await rq.create_order_db(data['internal_article'], data['quantity_s'], data['quantity_m'],
                                  data['quantity_l'], data['vendor_name'], data['sending_method'], data['order_image'],
                                  data['delivery_id'], data['color'], data['vendor_internal_article'], data['date'],
@@ -190,8 +226,15 @@ async def insert_image(message: Message, state: FSMContext):
         # await rq.set_sack_images(json_str, order.id)
         await message.answer('Заказ создан успешно')
         for chat_id in senders:
-            await message.bot.send_message(chat_id, f'Создан заказ\n'
-                                                    f'Артикул {data['internal_article']}\n')
+            if chat_id != message.chat.id:
+                media_list = [InputMediaPhoto(media=data['order_image'], caption=f'🔴Оповещение о создании заказа🔴\n'
+                                                                                 f'Артикул: {data['internal_article']}\n'
+                                                                                 f'Дата создания заказа: {data['date']}\n'
+                                                                                 f'Кол-во товара S: {data['quantity_s']}\n'
+                                                                                 f'Кол-во товара M: {data['quantity_m']}\n'
+                                                                                 f'Кол-во товара L: {data['quantity_l']}\n')]
+                await message.bot.send_media_group(media=media_list, chat_id=chat_id)
         await state.clear()
     except TypeError:
         await message.answer('Ошибка, попробуйте еще раз')
+

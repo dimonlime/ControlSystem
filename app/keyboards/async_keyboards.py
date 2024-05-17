@@ -25,7 +25,8 @@ async def inline_all_orders(income_id):
     data = await rq.all_orders()
     for order in data:
         if await half_year_check(order.date):
-            if order.delivery_id == income_id:
+            if (order.delivery_id == income_id and order.order_status != 'Передан в логистику' and
+                    order.order_status not in id_config.ru_order_status):
                 keyboard.add(InlineKeyboardButton(text=f'Арт: "{order.internal_article}", Дата: "{order.date}"',
                                                   callback_data=f'edit_status_{order.id}'))
     return keyboard.adjust(1).as_markup()
@@ -140,7 +141,8 @@ async def all_incomes_recipients():
     incomes = []
     for order in data:
         if await half_year_check(order.date):
-            if order.delivery_id not in incomes:
+            if (order.delivery_id not in incomes and order.order_status != 'Передан в логистику' and
+                    order.order_status not in id_config.ru_order_status):
                 incomes.append(order.delivery_id)
                 keyboard.add(InlineKeyboardButton(text=f'ID: {order.delivery_id} Дата: {order.delivery_date}',
                                                   callback_data=f'income_rec{order.delivery_id}'))
@@ -161,13 +163,24 @@ async def all_articles():
     return keyboard.adjust(1).as_markup()
 
 
+async def all_articles_table():
+    keyboard = InlineKeyboardBuilder()
+    articles = await rq.get_articles()
+    for article in articles:
+        keyboard.add(InlineKeyboardButton(text=f'Артикул: {article.article}',
+                                          callback_data=f'article_{article.article}'))
+    return keyboard.adjust(1).as_markup()
+
+
 async def all_incomes_senders():
     keyboard = InlineKeyboardBuilder()
     data = await rq.all_orders()
     incomes = []
     for order in data:
         if await half_year_check(order.date):
-            if order.delivery_id not in incomes and (order.order_status == 'Передан в логистику' or order.order_status in id_config.ru_order_status):
+            if order.delivery_id not in incomes and (
+                    order.order_status == 'Передан в логистику' or order.order_status in id_config.ru_order_status)\
+                    and order.order_status != 'Принято на складе WB':
                 incomes.append(order.delivery_id)
                 keyboard.add(InlineKeyboardButton(text=f'ID: {order.delivery_id} Дата: {order.delivery_date}',
                                                   callback_data=f'income_send_{order.delivery_id}'))
@@ -179,7 +192,9 @@ async def inline_all_orders_ru(income_id):
     data = await rq.all_orders()
     for order in data:
         if await half_year_check(order.date):
-            if order.delivery_id == income_id and (order.order_status == 'Передан в логистику' or order.order_status in id_config.ru_order_status):
+            if order.delivery_id == income_id and (
+                    order.order_status == 'Передан в логистику' or order.order_status in id_config.ru_order_status) \
+                    and order.order_status != 'Принято на складе WB':
                 keyboard.add(InlineKeyboardButton(text=f'Арт: "{order.internal_article}", Дата: "{order.date}"',
                                                   callback_data=f'ru_edit_status_{order.id}'))
     return keyboard.adjust(1).as_markup()

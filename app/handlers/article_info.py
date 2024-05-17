@@ -69,10 +69,11 @@ async def get_article_info(callback: CallbackQuery, state: FSMContext):
         sum_l_wb_send = 0
 
         for order in orders:
-            sum_all += order.S + order.M + order.L
-            sum_s_all += order.S
-            sum_m_all += order.M
-            sum_l_all += order.L
+            if order.order_status != 'Принято на складе WB':
+                sum_all += order.S + order.M + order.L
+                sum_s_all += order.S
+                sum_m_all += order.M
+                sum_l_all += order.L
             if order.order_status == 'Заказ создан':
                 sum_create += order.S + order.M + order.L
                 sum_s_create += order.S

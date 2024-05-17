@@ -38,6 +38,10 @@ class Order(Base):
     sack_images = Column(Text, nullable=True, default=None)
     color: Mapped[str] = mapped_column(String(50), nullable=True)
     vendor_internal_article: Mapped[str] = mapped_column(String(50), nullable=True, default='Не заполнено')
+    excel_1: Mapped[str] = mapped_column(String(50), nullable=True, default=None)
+    excel_2: Mapped[str] = mapped_column(String(50), nullable=True, default=None)
+    image_1: Mapped[str] = mapped_column(String(50), nullable=True, default=None)
+    image_2: Mapped[str] = mapped_column(String(50), nullable=True, default=None)
 
 
 class Cheque(Base):
@@ -67,6 +71,14 @@ class Fish(Base):
     sack_count: Mapped[int] = mapped_column(nullable=True, default=None)
     sending_method: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
     fish_image_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
+
+
+class ArticleImage(Base):
+    __tablename__ = 'article_image'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    article: Mapped[str] = mapped_column(nullable=True, default=None)
+    image_id: Mapped[str] = mapped_column(nullable=True, default=None)
 
 
 async def async_main():

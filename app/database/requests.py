@@ -1,6 +1,6 @@
 from sqlalchemy.exc import IntegrityError
 from app.database.models import async_session
-from app.database.models import Cheque, Order, Fish
+from app.database.models import Cheque, Order, Fish, ArticleImage
 from sqlalchemy import select
 
 import random
@@ -230,3 +230,69 @@ async def get_delivery_date_by_del_id(delivery_id):
         order = await session.scalar(select(Order).where(Order.delivery_id == delivery_id))
         delivery_date = order.delivery_date
         return delivery_date
+
+
+"""-----------------------------------------------------------------------------------------------------------------"""
+
+
+async def get_articles():
+    async with async_session() as session:
+        articles = await session.scalars(select(ArticleImage))
+        return articles
+
+
+async def get_article(article_id):
+    async with async_session() as session:
+        article = await session.scalar(select(ArticleImage).where(ArticleImage.article == article_id))
+        return article
+
+
+async def create_article(article, image_id):
+    async with async_session() as session:
+        session.add(ArticleImage(article=article, image_id=image_id))
+        await session.commit()
+
+
+async def remove_article(article_id):
+    async with async_session() as session:
+        article = await session.scalar(select(ArticleImage).where(ArticleImage.article == article_id))
+        await session.delete(article)
+        await session.commit()
+
+
+async def edit_image_article(article_id, image_id):
+    async with async_session() as session:
+        article = await session.scalar(select(ArticleImage).where(ArticleImage.article == article_id))
+        article.image_id = image_id
+        await session.commit()
+
+
+"""-----------------------------------------------------------------------------------------------------------------"""
+
+
+async def insert_excel_1(order_id, excel_file_id):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.excel_1 = excel_file_id
+        await session.commit()
+
+
+async def insert_excel_2(order_id, excel_file_id):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.excel_2 = excel_file_id
+        await session.commit()
+
+
+async def insert_image_1(order_id, image_file_id):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.image_1 = image_file_id
+        await session.commit()
+
+
+async def insert_image_2(order_id, image_file_id):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.image_2 = image_file_id
+        await session.commit()

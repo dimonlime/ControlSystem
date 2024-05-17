@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from app.database import requests as rq
 
 
 async def half_year_check(date):
@@ -19,3 +20,12 @@ async def half_year_check_cheques(date):
         return True
     else:
         return False
+
+
+async def check_article_image(internal_article):
+    articles = await rq.get_articles()
+    for article in articles:
+        if article.article == internal_article:
+            return article.image_id
+    return None
+

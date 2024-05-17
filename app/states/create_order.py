@@ -14,3 +14,4 @@ class create_order_state(StatesGroup):
     insert_delivery_date = State()
     insert_color = State()
     insert_vendor_internal_article = State()
+    create_order = State()

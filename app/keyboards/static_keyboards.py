@@ -18,9 +18,13 @@ sender_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Информация по артикулам')]
 ], resize_keyboard=True)
 
+add_article_keyboard = ReplyKeyboardMarkup(keyboard=[
+    [KeyboardButton(text='Добавить артикул'), KeyboardButton(text='Удалить артикул'), KeyboardButton(text='Список артикулов')],
+    [KeyboardButton(text='Назад')]
+], resize_keyboard=True)
+
 orders_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='Посмотреть заказы')],
-    [KeyboardButton(text='Изменить статус заказов')],
+    [KeyboardButton(text='Посмотреть заказы'), KeyboardButton(text='Изменить статус заказов')],
     [KeyboardButton(text='Назад')],
 ], resize_keyboard=True)
 
@@ -33,6 +37,9 @@ delivery_date = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Оставить текущую дату', callback_data='today_date')]
 ])
 
+action_article_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='Заменить фото', callback_data='replace_image')]
+])
 
 cheques_category = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Все чеки', callback_data='all_chques')],
