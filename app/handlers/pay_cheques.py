@@ -103,7 +103,7 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
             f'*Кол-во товара размера M:* {str(order.M)}\n'
             f'*Кол-во товара размера L:* {str(order.L)}\n'
             f'*Цвет:* {str(order.color)}\n'
-            f'*Название магазина:* {str(order.vendor_name)}\n'
+            f'*Название магазина:* {str(order.shop_name)}\n'
             f'*Способ отправки:* {str(order.sending_method)}\n'
             f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
     except AttributeError:
@@ -180,7 +180,7 @@ async def all_info(callback: CallbackQuery, state: FSMContext):
             f'Кол-во товара размера M: {str(order.M)}\n'
             f'Кол-во товара размера L: {str(order.L)}\n'
             f'Цвет: {str(order.color)}\n'
-            f'Название магазина: {str(order.vendor_name)}\n'
+            f'Название магазина: {str(order.shop_name)}\n'
             f'Способ отправки: {str(order.sending_method)}\n'
             f'Номер для мешков: {str(order.sack_number)}\n'
             f'Статус заказа: {str(order.order_status)}\n')

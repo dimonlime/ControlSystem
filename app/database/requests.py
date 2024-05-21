@@ -1,6 +1,6 @@
 from sqlalchemy.exc import IntegrityError
 from app.database.models import async_session
-from app.database.models import Cheque, Order, Fish, ArticleImage
+from app.database.models import Cheque, Order, Fish, ProductCard
 from sqlalchemy import select
 
 import random
@@ -23,10 +23,10 @@ async def create_cheque_db(vendor_name, price, image, order_id, cheque_date, che
                 pass
 
 
-async def create_order_db(internal_article, s, m, l, vendor_name, sending_method, image_id, delivery_id, color,
+async def create_order_db(internal_article, s, m, l, shop_name, sending_method, image_id, delivery_id, color,
                           vendor_internal_article, date, change_date, delivery_date):
     async with async_session() as session:
-        session.add(Order(internal_article=internal_article, S=s, M=m, L=l, vendor_name=vendor_name,
+        session.add(Order(internal_article=internal_article, S=s, M=m, L=l, shop_name=shop_name,
                           sending_method=sending_method, order_image_id=image_id, delivery_id=delivery_id,
                           color=color, vendor_internal_article=vendor_internal_article, date=date,
                           change_date=change_date, delivery_date=delivery_date))
@@ -199,7 +199,7 @@ async def edit_order_color(order_id, color):
 async def edit_order_name(order_id, name):
     async with async_session() as session:
         order = await session.scalar(select(Order).where(Order.id == order_id))
-        order.vendor_name = name
+        order.shop_name = name
         await session.commit()
 
 
@@ -235,35 +235,29 @@ async def get_delivery_date_by_del_id(delivery_id):
 """-----------------------------------------------------------------------------------------------------------------"""
 
 
-async def get_articles():
+async def get_product_cards():
     async with async_session() as session:
-        articles = await session.scalars(select(ArticleImage))
-        return articles
+        product_cards = await session.scalars(select(ProductCard))
+        return product_cards
 
 
-async def get_article(article_id):
+async def get_product_card(article):
     async with async_session() as session:
-        article = await session.scalar(select(ArticleImage).where(ArticleImage.article == article_id))
-        return article
+        product_card = await session.scalar(select(ProductCard).where(ProductCard.article == article))
+        return product_card
 
 
-async def create_article(article, image_id):
+async def create_product_card(article, vendor_article, color, shop_name, image_id):
     async with async_session() as session:
-        session.add(ArticleImage(article=article, image_id=image_id))
+        session.add(ProductCard(article=article, vendor_internal_article=vendor_article, color=color, shop_name=shop_name,
+                                image_id=image_id))
         await session.commit()
 
 
-async def remove_article(article_id):
+async def remove_product_card(article):
     async with async_session() as session:
-        article = await session.scalar(select(ArticleImage).where(ArticleImage.article == article_id))
+        article = await session.scalar(select(ProductCard).where(ProductCard.article == article))
         await session.delete(article)
-        await session.commit()
-
-
-async def edit_image_article(article_id, image_id):
-    async with async_session() as session:
-        article = await session.scalar(select(ArticleImage).where(ArticleImage.article == article_id))
-        article.image_id = image_id
         await session.commit()
 
 

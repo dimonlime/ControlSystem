@@ -4,7 +4,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from app.id_config import senders, recipients
 from app.keyboards import static_keyboards as static_kb
-from app.states.add_article import create_article
+from app.states.product_card import create_product_card
 
 router = Router()
 
@@ -23,12 +23,12 @@ async def start(message: Message, state: FSMContext):
             reply_markup=static_kb.recipient_keyboard)
 
 
-@router.message(Command(commands='add_article'))
+@router.message(Command(commands='create_product_card'))
 async def start(message: Message, state: FSMContext):
     if message.from_user.id in senders:
         await state.clear()
         await message.answer(
-            f'Меню добавления артикулов',
+            f'Меню создания карты товара',
             reply_markup=static_kb.add_article_keyboard)
     else:
         await state.clear()

@@ -19,7 +19,7 @@ sender_keyboard = ReplyKeyboardMarkup(keyboard=[
 ], resize_keyboard=True)
 
 add_article_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='Добавить артикул'), KeyboardButton(text='Удалить артикул'), KeyboardButton(text='Список артикулов')],
+    [KeyboardButton(text='Добавить карту товара'), KeyboardButton(text='Удалить карту товара'), KeyboardButton(text='Список карт товара')],
     [KeyboardButton(text='Назад')]
 ], resize_keyboard=True)
 

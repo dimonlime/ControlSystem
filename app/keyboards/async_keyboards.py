@@ -165,7 +165,7 @@ async def all_articles():
 
 async def all_articles_table():
     keyboard = InlineKeyboardBuilder()
-    articles = await rq.get_articles()
+    articles = await rq.get_product_cards()
     for article in articles:
         keyboard.add(InlineKeyboardButton(text=f'Артикул: {article.article}',
                                           callback_data=f'article_{article.article}'))

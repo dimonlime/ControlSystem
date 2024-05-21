@@ -46,7 +46,7 @@ async def edit_order_status_1(callback: CallbackQuery, state: FSMContext):
                                                 f'*Кол-во товара размера M:* {str(order.M)}\n'
                                                 f'*Кол-во товара размера L:* {str(order.L)}\n'
                                                 f'*Цвет:* {str(order.color)}\n'
-                                                f'*Название магазина:* {str(order.vendor_name)}\n'
+                                                f'*Название магазина:* {str(order.shop_name)}\n'
                                                 f'*Способ отправки:* {str(order.sending_method)}\n'
                                                 f'*Статус заказа:* {str(order.order_status)}\n',
                                         photo=order.order_image_id,
@@ -138,7 +138,7 @@ async def insert_image_cheque(message: Message, state: FSMContext):
         await state.update_data(date=datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
         data = await state.get_data()
         order = await rq.get_order(data['order_id'])
-        await rq.create_cheque_db(order.vendor_name, data['price'], data['image'], data['order_id'],
+        await rq.create_cheque_db(order.shop_name, data['price'], data['image'], data['order_id'],
                                   data['cheque_date'], data['cheque_number'], data['vendor_article'], data['date'])
         await rq.edit_order_status(data['order_id'], data['order_status'], data['order_change_date'])
         await rq.set_order_cheque_image(data['order_id'], data['image'])

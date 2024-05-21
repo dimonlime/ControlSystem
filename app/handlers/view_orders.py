@@ -119,9 +119,8 @@ async def get_all_orders(callback: CallbackQuery, state: FSMContext):
         media_list.append(InputMediaPhoto(media=fish.fish_image_id))
         if cheque.payment_image is not None:
             media_list.append(InputMediaPhoto(media=cheque.payment_image))
-        document_list.append(InputMediaDocument(media=order.excel_1))
+        media_list.append(InputMediaPhoto(media=order.image_1))
         await callback.message.answer_media_group(media=media_list)
-        await callback.message.answer_media_group(media=document_list)
         await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
     elif order.order_status == 'Принято на складе ПД':
         await state.update_data(cheque_id=cheque.id)
@@ -143,8 +142,8 @@ async def get_all_orders(callback: CallbackQuery, state: FSMContext):
         if cheque.payment_image is not None:
             media_list.append(InputMediaPhoto(media=cheque.payment_image))
         media_list.append(InputMediaPhoto(media=order.image_1))
+        media_list.append(InputMediaPhoto(media=order.image_2))
         document_list.append(InputMediaDocument(media=order.excel_1))
-        document_list.append(InputMediaDocument(media=order.excel_2))
         await callback.message.answer_media_group(media=media_list)
         await callback.message.answer_media_group(media=document_list)
         await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
@@ -179,7 +178,7 @@ async def order_info(callback: CallbackQuery, state: FSMContext):
             f'*Кол-во товара размера M:* {str(order.M)}\n'
             f'*Кол-во товара размера L:* {str(order.L)}\n'
             f'*Цвет:* {str(order.color)}\n'
-            f'*Название магазина:* {str(order.vendor_name)}\n'
+            f'*Название магазина:* {str(order.shop_name)}\n'
             f'*Способ отправки:* {str(order.sending_method)}\n'
             f'*Статус заказа:* {str(order.order_status)}\n', parse_mode="Markdown")
     except AttributeError:
@@ -256,7 +255,7 @@ async def all_info(callback: CallbackQuery, state: FSMContext):
             f'Кол-во товара размера M: {str(order.M)}\n'
             f'Кол-во товара размера L: {str(order.L)}\n'
             f'Цвет: {str(order.color)}\n'
-            f'Название магазина: {str(order.vendor_name)}\n'
+            f'Название магазина: {str(order.shop_name)}\n'
             f'Способ отправки: {str(order.sending_method)}\n'
             f'Номер для мешков: {str(order.sack_number)}\n'
             f'Статус заказа: {str(order.order_status)}\n')

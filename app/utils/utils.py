@@ -22,10 +22,9 @@ async def half_year_check_cheques(date):
         return False
 
 
-async def check_article_image(internal_article):
-    articles = await rq.get_articles()
-    for article in articles:
-        if article.article == internal_article:
-            return article.image_id
-    return None
-
+async def product_card_exists(internal_article):
+    product_cards = await rq.get_product_cards()
+    for product_card in product_cards:
+        if product_card.article == internal_article:
+            return True
+    return False

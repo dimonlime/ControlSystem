@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/app/handlers/add_article.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/handlers/add_product_card.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/handlers/article_info.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/handlers/change_status.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/handlers/change_status_ru.py" charset="UTF-8" />
@@ -11,18 +11,18 @@
     <file url="file://$PROJECT_DIR$/app/handlers/edit_order.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/handlers/fact_data.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/handlers/pay_cheques.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/handlers/remove_article.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/handlers/view_article.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/handlers/remove_product_card.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/handlers/view_orders.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/handlers/view_product_card.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/keyboards/async_keyboards.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/keyboards/static_keyboards.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/states/add_article.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/states/change_cheque_status.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/states/check_article.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/states/check_order.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/states/create_cheque.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/states/create_order.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/states/edit_order.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/states/product_card.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/states/ru_change_status.py" charset="UTF-8" />
   </component>
 </project>

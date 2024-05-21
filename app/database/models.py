@@ -25,7 +25,7 @@ class Order(Base):
     S: Mapped[int] = mapped_column(nullable=True, default=None)
     M: Mapped[int] = mapped_column(nullable=True, default=None)
     L: Mapped[int] = mapped_column(nullable=True, default=None)
-    vendor_name: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
+    shop_name: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
     sending_method: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
     order_image_id: Mapped[int] = mapped_column(nullable=True, default=None)
     order_status: Mapped[str] = mapped_column(String(25), nullable=True, default='Заказ создан')
@@ -73,12 +73,15 @@ class Fish(Base):
     fish_image_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
 
 
-class ArticleImage(Base):
-    __tablename__ = 'article_image'
+class ProductCard(Base):
+    __tablename__ = 'product_cards'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     article: Mapped[str] = mapped_column(nullable=True, default=None)
     image_id: Mapped[str] = mapped_column(nullable=True, default=None)
+    color: Mapped[str] = mapped_column(String(50), nullable=True)
+    shop_name: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
+    vendor_internal_article: Mapped[str] = mapped_column(String(50), nullable=True, default='Не заполнено')
 
 
 async def async_main():
