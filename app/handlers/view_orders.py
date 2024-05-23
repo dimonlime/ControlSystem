@@ -19,7 +19,7 @@ router = Router()
 async def check_all_orders(message: Message, state: FSMContext):
     await state.clear()
     if message.from_user.id in senders:
-        await message.answer('Выберите поставку:', reply_markup=await async_kb.all_incomes())
+        await message.answer('Выберите заказ:', reply_markup=await async_kb.all_orders())
 
 
 @router.callback_query(F.data.startswith('income_all_'))
@@ -59,38 +59,6 @@ async def get_all_orders(callback: CallbackQuery, state: FSMContext):
     await state.update_data(order_id=order_id)
     media_list = []
     document_list = []
-    # if order.cheque_image_id is None and order.fish is None:
-    #     media_list.append(InputMediaPhoto(media=order.order_image_id))
-    #     await callback.message.answer_media_group(media=media_list)
-    #     await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
-    # elif cheque.cheque_image_id is not None and order.fish is None and cheque.payment_image is None:
-    #     await state.update_data(cheque_id=cheque.id)
-    #     media_list.append(InputMediaPhoto(media=order.order_image_id))
-    #     media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
-    #     await callback.message.answer_media_group(media=media_list)
-    #     await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
-    # elif cheque.payment_image is not None and order.fish is None and cheque.cheque_image_id is not None:
-    #     await state.update_data(cheque_id=cheque.id)
-    #     media_list.append(InputMediaPhoto(media=order.order_image_id))
-    #     media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
-    #     media_list.append(InputMediaPhoto(media=cheque.payment_image))
-    #     await callback.message.answer_media_group(media=media_list)
-    #     await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
-    # elif order.cheque_image_id is not None and cheque.payment_image is not None and order.fish is not None:
-    #     await state.update_data(cheque_id=cheque.id)
-    #     media_list.append(InputMediaPhoto(media=order.order_image_id))
-    #     media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
-    #     media_list.append(InputMediaPhoto(media=cheque.payment_image))
-    #     media_list.append(InputMediaPhoto(media=fish.fish_image_id))
-    #     await callback.message.answer_media_group(media=media_list)
-    #     await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
-    # elif order.cheque_image_id is not None and cheque.payment_image is None and order.fish is not None:
-    #     await state.update_data(cheque_id=cheque.id)
-    #     media_list.append(InputMediaPhoto(media=order.order_image_id))
-    #     media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
-    #     media_list.append(InputMediaPhoto(media=fish.fish_image_id))
-    #     await callback.message.answer_media_group(media=media_list)
-    #     await callback.message.answer('Выберите действие:', reply_markup=static_kb.view_info)
     if order.order_status == 'Заказ создан' or order.order_status == 'Передан в работу поставщику':
         media_list.append(InputMediaPhoto(media=order.order_image_id))
         await callback.message.answer_media_group(media=media_list)

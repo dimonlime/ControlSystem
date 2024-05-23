@@ -27,8 +27,9 @@ async def inline_all_orders(income_id):
         if await half_year_check(order.date):
             if (order.delivery_id == income_id and order.order_status != 'Передан в логистику' and
                     order.order_status not in id_config.ru_order_status):
-                keyboard.add(InlineKeyboardButton(text=f'Арт: "{order.internal_article}", Дата: "{order.date}"',
-                                                  callback_data=f'edit_status_{order.id}'))
+                keyboard.add(InlineKeyboardButton(
+                    text=f'Арт: "{order.internal_article}", S: {order.S}, M: {order.M}, L: {order.L}',
+                    callback_data=f'edit_status_{order.id}'))
     return keyboard.adjust(1).as_markup()
 
 
@@ -91,8 +92,9 @@ async def inline_all_orders_send(income_id):
     for order in data:
         if await half_year_check(order.date):
             if order.delivery_id == income_id:
-                keyboard.add(InlineKeyboardButton(text=f'Арт: "{order.internal_article}"; Дата: "{order.date}"',
-                                                  callback_data=f'get_info_{order.id}'))
+                keyboard.add(InlineKeyboardButton(
+                    text=f'Арт: "{order.internal_article}", S: {order.S}, M: {order.M}, L: {order.L}',
+                    callback_data=f'get_info_{order.id}'))
     return keyboard.adjust(1).as_markup()
 
 
@@ -102,8 +104,9 @@ async def inline_all_orders_by_status(income_id, order_status):
     for order in data:
         if await half_year_check(order.date):
             if order.delivery_id == income_id and order.order_status == order_status:
-                keyboard.add(InlineKeyboardButton(text=f'Арт: "{order.internal_article}"; Дата: "{order.date}"',
-                                                  callback_data=f'get_info_{order.id}'))
+                keyboard.add(InlineKeyboardButton(
+                    text=f'Арт: "{order.internal_article}", S: {order.S}, M: {order.M}, L: {order.L}',
+                    callback_data=f'get_info_{order.id}'))
     return keyboard.adjust(1).as_markup()
 
 
@@ -179,7 +182,7 @@ async def all_incomes_senders():
     for order in data:
         if await half_year_check(order.date):
             if order.delivery_id not in incomes and (
-                    order.order_status == 'Передан в логистику' or order.order_status in id_config.ru_order_status)\
+                    order.order_status == 'Передан в логистику' or order.order_status in id_config.ru_order_status) \
                     and order.order_status != 'Принято на складе WB':
                 incomes.append(order.delivery_id)
                 keyboard.add(InlineKeyboardButton(text=f'ID: {order.delivery_id} Дата: {order.delivery_date}',
@@ -195,8 +198,9 @@ async def inline_all_orders_ru(income_id):
             if order.delivery_id == income_id and (
                     order.order_status == 'Передан в логистику' or order.order_status in id_config.ru_order_status) \
                     and order.order_status != 'Принято на складе WB':
-                keyboard.add(InlineKeyboardButton(text=f'Арт: "{order.internal_article}", Дата: "{order.date}"',
-                                                  callback_data=f'ru_edit_status_{order.id}'))
+                keyboard.add(InlineKeyboardButton(
+                    text=f'Арт: "{order.internal_article}", S: {order.S}, M: {order.M}, L: {order.L}',
+                    callback_data=f'ru_edit_status_{order.id}'))
     return keyboard.adjust(1).as_markup()
 
 
@@ -205,3 +209,31 @@ async def inline_ru_order_status():
     for status in id_config.ru_order_status:
         keyboard.add(InlineKeyboardButton(text=status, callback_data=f'ru_status_{status}'))
     return keyboard.adjust(1).as_markup()
+
+
+async def all_orders():
+    keyboard = InlineKeyboardBuilder()
+    orders = await rq.all_orders()
+    order_data = {}
+    unique_orders = []
+    for order in orders:
+        if order.internal_article not in order_data.keys():
+            order_data[order.internal_article] = {
+                'S': order.S,
+                'M': order.M,
+                'L': order.L,
+            }
+        else:
+            order_data[order.internal_article]['S'] += order.S
+            order_data[order.internal_article]['M'] += order.S
+            order_data[order.internal_article]['L'] += order.S
+    orders = await rq.all_orders()
+    for order in orders:
+        if order.internal_article not in unique_orders:
+            keyboard.add(InlineKeyboardButton(
+                text=f'АРТ: {order.internal_article}, S: {str(order_data[order.internal_article]['S'])} '
+                     f'M: {str(order_data[order.internal_article]['M'])} '
+                     f'L: {str(order_data[order.internal_article]['L'])}', callback_data=f'order_id_{order.id}'))
+        unique_orders.append(order.internal_article)
+    return keyboard.adjust(1).as_markup()
+
