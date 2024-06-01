@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from app.id_config import senders, recipients
 from app.keyboards import static_keyboards as static_kb
 from app.states.product_card import create_product_card
-from app.database import requests as rq
+from app.database.requests import product_card_request as card_rq
 
 router = Router()
 
@@ -55,7 +55,7 @@ async def insert_article_image(message: Message, state: FSMContext):
         image_id = message.photo[-1].file_id
         await state.update_data(image_id=image_id)
         data = await state.get_data()
-        await rq.create_product_card(data['article'], data['vendor_internal_article'], data['color'], data['shop_name'], data['image_id'])
+        await card_rq.create_product_card(data['article'], data['vendor_internal_article'], data['color'], data['shop_name'], data['image_id'])
         await message.answer('Карточка товара успешно создана')
         await state.clear()
     except ValueError:

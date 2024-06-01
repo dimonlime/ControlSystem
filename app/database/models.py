@@ -17,46 +17,55 @@ class Order(Base):
     __tablename__ = 'orders'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    delivery_id: Mapped[int] = mapped_column(nullable=True, default=None)
-    delivery_date: Mapped[datetime] = mapped_column(String(25))
-    date: Mapped[datetime] = mapped_column(String(25))
-    change_date: Mapped[datetime] = mapped_column(String(25))
-    internal_article: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
-    S: Mapped[int] = mapped_column(nullable=True, default=None)
-    M: Mapped[int] = mapped_column(nullable=True, default=None)
-    L: Mapped[int] = mapped_column(nullable=True, default=None)
-    shop_name: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
-    sending_method: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
-    order_image_id: Mapped[int] = mapped_column(nullable=True, default=None)
-    order_status: Mapped[str] = mapped_column(String(25), nullable=True, default='Заказ создан')
-    cheque_image_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
-    fish: Mapped[int] = mapped_column(nullable=True, default=None)
-    sack_number: Mapped[int] = mapped_column(nullable=True, unique=True)
-    fact_S: Mapped[int] = mapped_column(nullable=True, default=None)
-    fact_M: Mapped[int] = mapped_column(nullable=True, default=None)
-    fact_L: Mapped[int] = mapped_column(nullable=True, default=None)
-    sack_images = Column(Text, nullable=True, default=None)
-    color: Mapped[str] = mapped_column(String(50), nullable=True)
+    create_date: Mapped[str] = mapped_column(String(25))
+    change_date: Mapped[str] = mapped_column(String(25))
+    internal_article: Mapped[str] = mapped_column(String(25))
     vendor_internal_article: Mapped[str] = mapped_column(String(50), nullable=True, default='Не заполнено')
-    excel_1: Mapped[str] = mapped_column(String(50), nullable=True, default=None)
-    excel_2: Mapped[str] = mapped_column(String(50), nullable=True, default=None)
-    image_1: Mapped[str] = mapped_column(String(50), nullable=True, default=None)
-    image_2: Mapped[str] = mapped_column(String(50), nullable=True, default=None)
+    quantity_s: Mapped[int] = mapped_column()
+    quantity_m: Mapped[int] = mapped_column()
+    quantity_l: Mapped[int] = mapped_column()
+    color: Mapped[str] = mapped_column(String(50))
+    shop_name: Mapped[str] = mapped_column(String(25))
+    sending_method: Mapped[str] = mapped_column(String(25))
+    order_image: Mapped[str] = mapped_column()
+    status: Mapped[str] = mapped_column(String(25), default='Заказ не готов')
+
+
+class Shipment(Base):
+    __tablename__ = 'shipments'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'))
+    create_date: Mapped[str] = mapped_column(String(25))
+    change_date: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
+    quantity_s: Mapped[int] = mapped_column()
+    quantity_m: Mapped[int] = mapped_column()
+    quantity_l: Mapped[int] = mapped_column()
+    status: Mapped[str] = mapped_column(String(25), default='Поставка отправлена')
+    sending_method: Mapped[str] = mapped_column(String(25))
+    sack_number: Mapped[int] = mapped_column(nullable=True, unique=True, default=None)
+    fish: Mapped[int] = mapped_column(ForeignKey('fishes.id'))
+    cheque: Mapped[int] = mapped_column(ForeignKey('cheques.id'))
+    document_1_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
+    document_2_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
+    image_1_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
+    image_2_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
 
 
 class Cheque(Base):
     __tablename__ = 'cheques'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    date: Mapped[datetime] = mapped_column(String(25))
-    cheque_date: Mapped[datetime] = mapped_column(String(25))
-    vendor_name: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
-    cheque_number: Mapped[int] = mapped_column(nullable=True, default=None)
-    vendor_article: Mapped[int] = mapped_column(nullable=True, default=None)
-    price: Mapped[int] = mapped_column(nullable=True, default=None)
-    cheque_image_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
-    cheque_status: Mapped[str] = mapped_column(String(25), default='По чеку имеется отсрочка')
+    shipment_id: Mapped[int] = mapped_column(ForeignKey('shipments.id'), nullable=True)
     order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'))
+    date: Mapped[str] = mapped_column(String(25))
+    create_date: Mapped[str] = mapped_column(String(25))
+    shop_name: Mapped[str] = mapped_column(String(25))
+    cheque_number: Mapped[int] = mapped_column()
+    vendor_internal_article: Mapped[int] = mapped_column()
+    price: Mapped[int] = mapped_column()
+    cheque_image_id: Mapped[str] = mapped_column(String(255))
+    cheque_status: Mapped[str] = mapped_column(String(25), default='По чеку имеется отсрочка')
     payment_image: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
 
 
@@ -64,23 +73,24 @@ class Fish(Base):
     __tablename__ = 'fishes'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    shipment_id: Mapped[int] = mapped_column(ForeignKey('shipments.id'), nullable=True)
     order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'))
-    fish: Mapped[int] = mapped_column(nullable=True, default=None)
-    date: Mapped[datetime] = mapped_column(String(25), nullable=True, default=None)
-    weight: Mapped[int] = mapped_column(nullable=True, default=None)
-    sack_count: Mapped[int] = mapped_column(nullable=True, default=None)
-    sending_method: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
-    fish_image_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
+    fish_number: Mapped[int] = mapped_column()
+    fish_date: Mapped[datetime] = mapped_column(String(25))
+    weight: Mapped[int] = mapped_column()
+    sack_count: Mapped[int] = mapped_column()
+    sending_method: Mapped[str] = mapped_column(String(25))
+    fish_image_id: Mapped[str] = mapped_column(String(255))
 
 
 class ProductCard(Base):
     __tablename__ = 'product_cards'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    article: Mapped[str] = mapped_column(nullable=True, default=None)
-    image_id: Mapped[str] = mapped_column(nullable=True, default=None)
-    color: Mapped[str] = mapped_column(String(50), nullable=True)
-    shop_name: Mapped[str] = mapped_column(String(25), nullable=True, default=None)
+    article: Mapped[str] = mapped_column()
+    image_id: Mapped[str] = mapped_column()
+    color: Mapped[str] = mapped_column(String(50))
+    shop_name: Mapped[str] = mapped_column(String(25))
     vendor_internal_article: Mapped[str] = mapped_column(String(50), nullable=True, default='Не заполнено')
 
 
