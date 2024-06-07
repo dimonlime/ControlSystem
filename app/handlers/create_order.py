@@ -2,7 +2,7 @@ from datetime import datetime
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message, InputMediaPhoto
 from aiogram.fsm.context import FSMContext
-from app.id_config import senders
+from app.id_config import senders, recipients
 from app.keyboards import async_keyboards as async_kb
 from app.keyboards import static_keyboards as static_kb
 from app.database.requests import order_request as order_rq
@@ -12,8 +12,6 @@ from app.utils.utils import product_card_exists
 from app.states.create_order import create_order_state
 
 router = Router()
-
-"""Создание заказа--------------------------------------------------------------------------------------------------"""
 
 
 @router.message(F.text == 'Создать заказ')
@@ -96,7 +94,8 @@ async def insert_image_auto(message: Message, state: FSMContext):
                                    data['quantity_s'], data['quantity_m'], data['quantity_l'], data['color'], data['shop_name'],
                                    data['sending_method'], data['order_image'])
     await message.answer('Заказ создан успешно')
-    for chat_id in senders:
+    chat_ids = senders + recipients
+    for chat_id in chat_ids:
         if chat_id != message.chat.id:
             media_list = [InputMediaPhoto(media=data['order_image'],
                                           caption=f'🔴*Оповещение о создании заказа*🔴\n'

@@ -26,6 +26,7 @@
     <file url="file://$PROJECT_DIR$/app/handlers/view_shipment.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/keyboards/async_keyboards.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/keyboards/static_keyboards.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/states/article.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/states/change_cheque_status.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/states/check_article.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/states/cheque.py" charset="UTF-8" />

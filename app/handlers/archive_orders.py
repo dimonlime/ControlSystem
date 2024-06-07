@@ -48,7 +48,7 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
         remain_s = order.quantity_s - ship_s
         remain_m = order.quantity_m - ship_m
         remain_l = order.quantity_l - ship_l
-        caption += f'🔴 *Ожидается* *S:* _{remain_s}_ *M:* _{remain_m}_ *L:* _{remain_l}_\n'
+        caption += f'🔴 *Не отправлено* *S:* _{remain_s}_ *M:* _{remain_m}_ *L:* _{remain_l}_\n'
     else:
         caption += f'🟢 *Заказанное кол-во отправлено*\n'
     if not await shipments_ready(order_id):
@@ -57,4 +57,4 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
         caption += f'🟢 *Все текущие поставки приняты на складе WB*\n'
     media_list = [InputMediaPhoto(media=order.order_image, caption=caption, parse_mode="Markdown")]
     await callback.message.answer_media_group(media=media_list)
-    await callback.message.answer(f'Выберите действие', reply_markup=static_kb.order_actions)
+    await callback.message.answer(f'Выберите действие', reply_markup=static_kb.archive_order_actions)

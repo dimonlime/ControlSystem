@@ -14,7 +14,7 @@ recipient_keyboard = ReplyKeyboardMarkup(keyboard=[
 sender_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Создать заказ')],
     [KeyboardButton(text='Чеки'), KeyboardButton(text='Заказы')],
-    # [KeyboardButton(text='Информация по артикулам')]
+    [KeyboardButton(text='Информация по артикулам')],
 ], resize_keyboard=True)
 
 add_article_keyboard = ReplyKeyboardMarkup(keyboard=[
@@ -44,10 +44,21 @@ recipient_order = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Отправить товар', callback_data='create_shipment')]
 ])
 
-order_actions = InlineKeyboardMarkup(inline_keyboard=[
+active_order_actions = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='Список поставок', callback_data='view_shipments')],
+    [InlineKeyboardButton(text='Все данные', callback_data='all_data_order')],
+    [InlineKeyboardButton(text='Отправить в архив', callback_data='close_order')],
+    # [InlineKeyboardButton(text='Редактировать данные', callback_data='edit_data')]
+])
+
+archive_order_actions = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Список поставок', callback_data='view_shipments')],
     [InlineKeyboardButton(text='Все данные', callback_data='all_data_order')],
     # [InlineKeyboardButton(text='Редактировать данные', callback_data='edit_data')]
+])
+
+close_order = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='Отправить в архив', callback_data='send_to_archive'), InlineKeyboardButton(text='Назад', callback_data='back')],
 ])
 
 shipment_actions = InlineKeyboardMarkup(inline_keyboard=[

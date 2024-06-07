@@ -34,3 +34,9 @@ async def set_status(order_id, status):
         order.change_date = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
         await session.commit()
 
+
+async def get_orders_by_article(internal_article):
+    async with async_session() as session:
+        orders = await session.scalars(select(Order).where(Order.internal_article == internal_article))
+        return orders
+

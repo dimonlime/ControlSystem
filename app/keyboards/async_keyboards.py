@@ -128,3 +128,17 @@ async def paid_cheques():
                                                f' L: {shipment.quantity_l}',
                                           callback_data=f'paid_cheque_id_{cheque.id}'))
     return keyboard.adjust(1).as_markup()
+
+
+async def all_articles():
+    keyboard = InlineKeyboardBuilder()
+    data = await order_rq.all_orders()
+    articles = []
+    for order in data:
+        if await half_year_check(order.create_date) and order.status != 'Заказ готов':
+            if order.internal_article not in articles:
+                articles.append(order.internal_article)
+    for article in articles:
+        keyboard.add(InlineKeyboardButton(text=f'Артикул: {article}',
+                                          callback_data=f'article_{article}'))
+    return keyboard.adjust(1).as_markup()

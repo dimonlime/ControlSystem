@@ -27,11 +27,11 @@ async def check_all_orders(message: Message, state: FSMContext):
 
 
 @router.callback_query(F.data.startswith('order_id_'), check_orders.select_order)
-async def check_income_order(callback: CallbackQuery, state: FSMContext):
+async def check_income_order_1(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     order_id = str(callback.data)[9:]
     order = await order_rq.get_order(order_id)
-    await state.update_data(order=order)
+    await state.update_data(order=order, callback=callback, state=state)
     ship_s = await shipments_quantity_s(order_id)
     ship_m = await shipments_quantity_m(order_id)
     ship_l = await shipments_quantity_l(order_id)
@@ -51,6 +51,7 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
         remain_s = order.quantity_s - ship_s
         remain_m = order.quantity_m - ship_m
         remain_l = order.quantity_l - ship_l
+        await state.update_data(remain_s=remain_s, remain_m=remain_m, remain_l=remain_l)
         caption += f'🔴 *Ожидается* *S:* _{remain_s}_ *M:* _{remain_m}_ *L:* _{remain_l}_\n'
     else:
         caption += f'🟢 *Заказанное кол-во отправлено*\n'
@@ -60,11 +61,11 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
         caption += f'🟢 *Все текущие поставки приняты на складе WB*\n'
     media_list = [InputMediaPhoto(media=order.order_image, caption=caption, parse_mode="Markdown")]
     await callback.message.answer_media_group(media=media_list)
-    await callback.message.answer(f'Выберите действие', reply_markup=static_kb.order_actions)
+    await callback.message.answer(f'Выберите действие', reply_markup=static_kb.active_order_actions)
 
 
 @router.callback_query(F.data.startswith('all_data_shipment'))
-async def check_income_order(callback: CallbackQuery, state: FSMContext):
+async def check_income_order_2(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     shipment = data['shipment']
@@ -94,7 +95,7 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data.startswith('all_data_order'))
-async def check_income_order(callback: CallbackQuery, state: FSMContext):
+async def check_income_order_3(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
     order = data['order']
@@ -111,3 +112,37 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
             f'*Способ отправки:* _{str(order.sending_method)}_\n'
             f'*Статус заказа:* _{str(order.status)}_\n')
     await callback.message.answer(text, parse_mode="Markdown")
+
+
+@router.callback_query(F.data == 'close_order')
+async def check_income_order_4(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    data = await state.get_data()
+    if not await shipments_ready(data['order'].id):
+        await callback.message.answer('*Нельзя отправить заказ в архив, т.к не все поставки приняты на складе WB*', parse_mode='Markdown')
+    else:
+        await state.set_state(check_orders.close_order)
+        await callback.message.answer(f'*Не отправлено S:* _{data["remain_s"]}_ *M:* _{data["remain_m"]}_ *L:* _{data["remain_l"]}_\n'
+                                      f'*Вы уверены, что хотите отправить заказ в архив?*', reply_markup=static_kb.close_order, parse_mode='Markdown')
+
+
+@router.callback_query(F.data == 'send_to_archive', check_orders.close_order)
+async def check_income_order_5(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    data = await state.get_data()
+    try:
+        await order_rq.set_status(data["order"].id, 'Заказ готов')
+        await callback.message.answer('*Заказ был отправлен в архив*', parse_mode='Markdown')
+        await state.clear()
+    except Exception as e:
+        await callback.message.answer(str(e))
+
+
+@router.callback_query(F.data == 'back', check_orders.close_order)
+async def check_income_order_6(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    data = await state.get_data()
+    try:
+        await check_income_order_1(data['callback'], data['state'])
+    except Exception as e:
+        await callback.message.answer(str(e))

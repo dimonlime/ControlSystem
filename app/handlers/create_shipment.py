@@ -2,7 +2,7 @@ from datetime import datetime
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message, InputMediaPhoto
 from aiogram.fsm.context import FSMContext
-from app.id_config import recipients
+from app.id_config import recipients, senders
 from app.keyboards import async_keyboards as async_kb
 from app.keyboards import static_keyboards as static_kb
 from app.database.requests import order_request as order_rq
@@ -124,6 +124,20 @@ async def create_shipment(message: Message, state: FSMContext):
         shipment = await ship_rq.get_last_ship(data['order'].id)
         await fish_rq.insert_shipment_id(data['fish'].id, shipment.first().id)
         await message.answer('Поставка создана успешно!')
+        shipment = await ship_rq.get_last_ship(data['order'].id)
+        await state.update_data(shipment=shipment.first())
+        data = await state.get_data()
+        for chat_id in senders:
+            if chat_id != message.chat.id:
+                media_list = [InputMediaPhoto(media=data['order'].order_image,
+                                              caption=f'🔴*Оповещение о создании поставки*🔴\n'
+                                                      f"*Артикул:* _{data['order'].internal_article}_\n"
+                                                      f"*Дата создания поставки:* _{data["shipment"].create_date}_\n"
+                                                      f"*Кол-во товара* *S:* _{data["shipment"].quantity_s}_ *M:* _{data["shipment"].quantity_m}_ *L:* _{data["shipment"].quantity_l}_\n",
+                                              parse_mode="Markdown"),
+                              InputMediaPhoto(media=data['fish'].fish_image_id),
+                              InputMediaPhoto(media=data['cheque'].cheque_image_id)]
+                await message.bot.send_media_group(media=media_list, chat_id=chat_id)
         await state.clear()
     except ValueError:
         await message.answer('Ошибка, попробуйте еще раз')
