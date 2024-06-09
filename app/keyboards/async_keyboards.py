@@ -6,6 +6,7 @@ from app.database.requests import order_request as order_rq
 from app.database.requests import shipment_request as ship_rq
 from app.database.requests import product_card_request as card_rq
 from app.database.requests import cheque_request as cheque_rq
+from app.database.requests import fish_request as fish_rq
 from app.utils.utils import half_year_check, enough_quantity_order
 
 
@@ -141,4 +142,45 @@ async def all_articles():
     for article in articles:
         keyboard.add(InlineKeyboardButton(text=f'Артикул: {article}',
                                           callback_data=f'article_{article}'))
+    return keyboard.adjust(1).as_markup()
+
+
+async def all_shipments():
+    keyboard = InlineKeyboardBuilder()
+    shipments = await ship_rq.get_all_shipments()
+    for shipment in shipments:
+        if await half_year_check(shipment.create_date) and shipment.status != 'Принята на складе WB':
+            date = datetime.strptime(shipment.create_date, '%d-%m-%Y %H:%M:%S')
+            str_date = datetime.strftime(date, '%d-%m-%Y')
+            keyboard.add(InlineKeyboardButton(text=f'Дата {str_date} '
+                                                   f'S: {shipment.quantity_s} '
+                                                   f'M: {shipment.quantity_m} '
+                                                   f'L: {shipment.quantity_l}',
+                                              callback_data=f'shipment_id_{shipment.id}'))
+    return keyboard.adjust(1).as_markup()
+
+
+async def all_cheques():
+    keyboard = InlineKeyboardBuilder()
+    cheques = await cheque_rq.get_all_cheques()
+    for cheque in cheques:
+        shipment = await ship_rq.get_shipment(cheque.shipment_id)
+        if await half_year_check(cheque.date) and cheque.cheque_status != 'Чек оплачен':
+            keyboard.add(InlineKeyboardButton(text=f'Цена: {cheque.price}$ S: {shipment.quantity_s} M: {shipment.quantity_m}'
+                                                   f' L: {shipment.quantity_l}',
+                                              callback_data=f'cheque_id_{cheque.id}'))
+    return keyboard.adjust(1).as_markup()
+
+
+async def all_fishes():
+    keyboard = InlineKeyboardBuilder()
+    fishes = await fish_rq.get_all_fishes()
+    for fish in fishes:
+        shipment = await ship_rq.get_shipment(fish.shipment_id)
+        if await half_year_check(fish.fish_date) and shipment.status != 'Принята на складе WB':
+            date = datetime.strptime(fish.fish_date, '%d-%m-%Y %H:%M:%S')
+            str_date = datetime.strftime(date, '%d-%m-%Y')
+            keyboard.add(InlineKeyboardButton(text=f'Дата {str_date} S: {shipment.quantity_s} M: {shipment.quantity_m}'
+                                                   f' L: {shipment.quantity_l}',
+                                              callback_data=f'fish_id_{fish.id}'))
     return keyboard.adjust(1).as_markup()

@@ -17,8 +17,6 @@ from app.states.shipment import create_shipment_state, create_cheque_state, crea
 
 router = Router()
 
-"""Создание заказа--------------------------------------------------------------------------------------------------"""
-
 
 @router.message(F.text == 'Создать поставку')
 async def create_order(message: Message, state: FSMContext):

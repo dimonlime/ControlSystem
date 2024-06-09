@@ -14,7 +14,7 @@ recipient_keyboard = ReplyKeyboardMarkup(keyboard=[
 sender_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Создать заказ')],
     [KeyboardButton(text='Чеки'), KeyboardButton(text='Заказы')],
-    [KeyboardButton(text='Информация по артикулам')],
+    [KeyboardButton(text='Информация по артикулам'), KeyboardButton(text='Редактировать данные')],
 ], resize_keyboard=True)
 
 add_article_keyboard = ReplyKeyboardMarkup(keyboard=[
@@ -48,13 +48,11 @@ active_order_actions = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Список поставок', callback_data='view_shipments')],
     [InlineKeyboardButton(text='Все данные', callback_data='all_data_order')],
     [InlineKeyboardButton(text='Отправить в архив', callback_data='close_order')],
-    # [InlineKeyboardButton(text='Редактировать данные', callback_data='edit_data')]
 ])
 
 archive_order_actions = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Список поставок', callback_data='view_shipments')],
     [InlineKeyboardButton(text='Все данные', callback_data='all_data_order')],
-    # [InlineKeyboardButton(text='Редактировать данные', callback_data='edit_data')]
 ])
 
 close_order = InlineKeyboardMarkup(inline_keyboard=[
@@ -63,4 +61,31 @@ close_order = InlineKeyboardMarkup(inline_keyboard=[
 
 shipment_actions = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Все данные', callback_data='all_data_shipment')],
+])
+
+edit_data = ReplyKeyboardMarkup(keyboard=[
+    [KeyboardButton(text='Редактировать заказ'), KeyboardButton(text='Редактировать поставку')],
+    [KeyboardButton(text='Назад')],
+], resize_keyboard=True)
+
+edit_order = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='Кол-во товара S', callback_data='edit_quantity_s')],
+    [InlineKeyboardButton(text='Кол-во товара M', callback_data='edit_quantity_m')],
+    [InlineKeyboardButton(text='Кол-во товара L', callback_data='edit_quantity_l')],
+    [InlineKeyboardButton(text='Способ отправки', callback_data='edit_sending_method')],
+])
+
+
+edit_shipment = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='Кол-во товара S', callback_data='edit_quantity_s')],
+    [InlineKeyboardButton(text='Кол-во товара M', callback_data='edit_quantity_m')],
+    [InlineKeyboardButton(text='Кол-во товара L', callback_data='edit_quantity_l')],
+    [InlineKeyboardButton(text='Дата чека', callback_data='edit_cheque_date')],
+    [InlineKeyboardButton(text='Номер чека', callback_data='edit_cheque_date')],
+    [InlineKeyboardButton(text='Артикул поставщика', callback_data='edit_cheque_date')],
+    [InlineKeyboardButton(text='Цена', callback_data='edit_cheque_date')],
+    [InlineKeyboardButton(text='Номер FIS`', callback_data='edit_cheque_date')],
+    [InlineKeyboardButton(text='Дата FIS`', callback_data='edit_cheque_date')],
+    [InlineKeyboardButton(text='Вес', callback_data='edit_cheque_date')],
+    [InlineKeyboardButton(text='Кол-во мешков', callback_data='edit_cheque_date')],
 ])

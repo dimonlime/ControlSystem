@@ -28,3 +28,9 @@ async def insert_shipment_id(fish_id, shipment_id):
         fish = await session.scalar(select(Fish).where(Fish.id == fish_id))
         fish.shipment_id = shipment_id
         await session.commit()
+
+
+async def get_all_fishes():
+    async with async_session() as session:
+        fishes = await session.scalars(select(Fish))
+        return fishes

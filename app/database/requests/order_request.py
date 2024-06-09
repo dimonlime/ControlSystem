@@ -40,3 +40,30 @@ async def get_orders_by_article(internal_article):
         orders = await session.scalars(select(Order).where(Order.internal_article == internal_article))
         return orders
 
+
+async def insert_quantity_s(order_id, quantity_s):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.quantity_s = quantity_s
+        await session.commit()
+
+
+async def insert_quantity_m(order_id, quantity_m):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.quantity_m = quantity_m
+        await session.commit()
+
+
+async def insert_quantity_l(order_id, quantity_l):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.quantity_l = quantity_l
+        await session.commit()
+
+
+async def insert_sending_method(order_id, sending_method):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        order.sending_method = sending_method
+        await session.commit()

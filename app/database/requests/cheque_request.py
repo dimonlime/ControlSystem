@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from app.database.models import async_session
 from app.database.models import Cheque, Order, Fish, ProductCard
 from sqlalchemy import select
@@ -47,6 +49,7 @@ async def insert_payment_image(cheque_id, payment_image_id):
     async with async_session() as session:
         cheque = await session.scalar(select(Cheque).where(Cheque.id == cheque_id))
         cheque.payment_image = payment_image_id
+        cheque.create_date = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
         cheque.cheque_status = 'Чек оплачен'
         await session.commit()
 

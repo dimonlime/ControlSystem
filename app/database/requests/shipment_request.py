@@ -9,7 +9,7 @@ async def create_shipment_db(order_id, create_date, quantity_s, quantity_m, quan
                              cheque_id):
     async with async_session() as session:
         session.add(
-            Shipment(order_id=order_id, create_date=create_date, quantity_s=quantity_s, quantity_m=quantity_m,
+            Shipment(order_id=order_id, create_date=create_date, change_date=create_date, quantity_s=quantity_s, quantity_m=quantity_m,
                      quantity_l=quantity_l,
                      sending_method=sending_method, fish=fish_id, cheque=cheque_id))
         await session.commit()
@@ -73,4 +73,25 @@ async def set_status(shipment_id, status):
         shipment = await session.scalar(select(Shipment).where(Shipment.id == shipment_id))
         shipment.status = status
         shipment.change_date = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
+        await session.commit()
+
+
+async def insert_quantity_s(shipment_id, quantity_s):
+    async with async_session() as session:
+        shipment = await session.scalar(select(Shipment).where(Shipment.id == shipment_id))
+        shipment.quantity_s = quantity_s
+        await session.commit()
+
+
+async def insert_quantity_m(shipment_id, quantity_m):
+    async with async_session() as session:
+        shipment = await session.scalar(select(Shipment).where(Shipment.id == shipment_id))
+        shipment.quantity_m = quantity_m
+        await session.commit()
+
+
+async def insert_quantity_l(shipment_id, quantity_l):
+    async with async_session() as session:
+        shipment = await session.scalar(select(Shipment).where(Shipment.id == shipment_id))
+        shipment.quantity_l = quantity_l
         await session.commit()
