@@ -318,3 +318,22 @@ async def edit_order(message: Message, state: FSMContext):
         await state.set_state(edit_shipment.edit_value)
     except ValueError:
         await message.answer('Ошибка, попробуйте еще раз')
+
+
+@router.callback_query(F.data == 'edit_price', edit_shipment.edit_value)
+async def edit_order(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await state.set_state(edit_shipment.edit_price)
+    await callback.message.answer('Введите цену:')
+
+
+@router.message(edit_shipment.edit_price)
+async def edit_order(message: Message, state: FSMContext):
+    try:
+        price = int(message.text)
+        data = await state.get_data()
+        await cheque_rq.edit_price(data['cheque'].id, price)
+        await message.answer(f'Значение цены успешно обновлено({price})')
+        await state.set_state(edit_shipment.edit_value)
+    except ValueError:
+        await message.answer('Ошибка, попробуйте еще раз')

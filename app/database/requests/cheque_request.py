@@ -77,3 +77,10 @@ async def get_paid_cheques():
     async with async_session() as session:
         cheques = await session.scalars(select(Cheque).where(Cheque.cheque_status == 'Чек оплачен'))
         return cheques
+
+
+async def edit_price(cheque_id, price):
+    async with async_session() as session:
+        cheque = await session.scalar(select(Cheque).where(Cheque.id == cheque_id))
+        cheque.price = price
+        await session.commit()

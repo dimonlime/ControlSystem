@@ -17,6 +17,7 @@ class edit_shipment(StatesGroup):
     insert_quantity_m = State()
     insert_quantity_l = State()
     edit_sending_method = State()
+    edit_price = State()
 
 
 class edit_cheque(StatesGroup):

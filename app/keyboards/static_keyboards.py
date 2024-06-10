@@ -83,7 +83,7 @@ edit_shipment = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Дата чека', callback_data='edit_cheque_date')],
     [InlineKeyboardButton(text='Номер чека', callback_data='edit_cheque_date')],
     [InlineKeyboardButton(text='Артикул поставщика', callback_data='edit_cheque_date')],
-    [InlineKeyboardButton(text='Цена', callback_data='edit_cheque_date')],
+    [InlineKeyboardButton(text='Цена', callback_data='edit_price')],
     [InlineKeyboardButton(text='Номер FIS`', callback_data='edit_cheque_date')],
     [InlineKeyboardButton(text='Дата FIS`', callback_data='edit_cheque_date')],
     [InlineKeyboardButton(text='Вес', callback_data='edit_cheque_date')],

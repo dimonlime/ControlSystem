@@ -82,7 +82,7 @@ async def check_all_orders(message: Message, state: FSMContext):
                                                       f"*Арт:* _{data['order'].internal_article}_\n"
                                                       f"*Цена:* _{data['cheque'].price}_*$*\n"
                                                       f"*Дата чека:* _{data['cheque'].date}_\n"
-                                                      f"*Кол-во товара* *S:* _{data["shipment"].quantity_s}_ *M:* _{data["shipment"].quantity_m}_ *L:* _{data["shipment"].quantity_l}_\n",
+                                                      f"*Кол-во товара* *S:* _{data['shipment'].quantity_s}_ *M:* _{data['shipment'].quantity_m}_ *L:* _{data['shipment'].quantity_l}_\n",
                                               parse_mode="Markdown"),
                               InputMediaPhoto(media=data['cheque'].payment_image)]
                 await message.bot.send_media_group(media=media_list, chat_id=chat_id)
