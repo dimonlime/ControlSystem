@@ -36,7 +36,10 @@ async def check_income_order_1(callback: CallbackQuery, state: FSMContext):
     ship_m = await shipments_quantity_m(order_id)
     ship_l = await shipments_quantity_l(order_id)
     order_create_date = datetime.strptime(order.create_date, "%d-%m-%Y %H:%M:%S")
-    caption = (f'*Артикул:* _{order.internal_article}_\n'
+    caption = ''
+    if order.flag:
+        caption += f'🚩 *Заказ отмечен*\n'
+    caption += (f'*Артикул:* _{order.internal_article}_\n'
                f'*Дата создания заказа:* _{datetime.strftime(order_create_date, "%d-%m-%Y %H:%M")}_\n'
                f'*Цвет:* _{order.color}_\n'
                f'*Название магазина:* _{order.shop_name}_\n'
@@ -146,3 +149,15 @@ async def check_income_order_6(callback: CallbackQuery, state: FSMContext):
         await check_income_order_1(data['callback'], data['state'])
     except Exception as e:
         await callback.message.answer(str(e))
+
+
+@router.callback_query(F.data == 'mark_order')
+async def check_income_order_6(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    data = await state.get_data()
+    await order_rq.mark_order(data['order'].id)
+    order = await order_rq.get_order(data['order'].id)
+    if order.flag:
+        await callback.message.answer('Заказ был отмечен')
+    else:
+        await callback.message.answer('Заказ больше не отмечен')

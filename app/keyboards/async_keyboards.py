@@ -22,11 +22,15 @@ async def all_orders():
     orders = await order_rq.all_orders()
     for order in orders:
         if await half_year_check(order.create_date) and order.status == 'Заказ не готов':
-            keyboard.add(InlineKeyboardButton(
-                text=f'АРТ: {order.internal_article} '
+            text = ''
+            if order.flag:
+                text += '🚩'
+            text += (f'АРТ: {order.internal_article} '
                      f'S: {order.quantity_s} '
                      f'M: {order.quantity_m} '
-                     f'L: {order.quantity_l}',
+                     f'L: {order.quantity_l}')
+            keyboard.add(InlineKeyboardButton(
+                text=text,
                 callback_data=f'order_id_{order.id}'))
     return keyboard.adjust(1).as_markup()
 
@@ -36,11 +40,15 @@ async def recipient_orders():
     orders = await order_rq.all_orders()
     for order in orders:
         if await half_year_check(order.create_date) and order.status == 'Заказ не готов' and not await enough_quantity_order(order.id):
-            keyboard.add(InlineKeyboardButton(
-                text=f'АРТ: {order.internal_article} '
+            text = ''
+            if order.flag:
+                text += '🚩'
+            text += (f'АРТ: {order.internal_article} '
                      f'S: {order.quantity_s} '
                      f'M: {order.quantity_m} '
-                     f'L: {order.quantity_l}',
+                     f'L: {order.quantity_l}')
+            keyboard.add(InlineKeyboardButton(
+                text=text,
                 callback_data=f'order_id_{order.id}'))
     return keyboard.adjust(1).as_markup()
 

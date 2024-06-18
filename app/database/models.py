@@ -29,6 +29,7 @@ class Order(Base):
     sending_method: Mapped[str] = mapped_column(String(25))
     order_image: Mapped[str] = mapped_column()
     status: Mapped[str] = mapped_column(String(25), default='Заказ не готов')
+    flag: Mapped[bool] = mapped_column(default=False)
 
 
 class Shipment(Base):

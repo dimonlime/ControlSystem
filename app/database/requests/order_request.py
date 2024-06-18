@@ -67,3 +67,13 @@ async def insert_sending_method(order_id, sending_method):
         order = await session.scalar(select(Order).where(Order.id == order_id))
         order.sending_method = sending_method
         await session.commit()
+
+
+async def mark_order(order_id):
+    async with async_session() as session:
+        order = await session.scalar(select(Order).where(Order.id == order_id))
+        if order.flag:
+            order.flag = False
+        else:
+            order.flag = True
+        await session.commit()

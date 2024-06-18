@@ -47,6 +47,7 @@ recipient_order = InlineKeyboardMarkup(inline_keyboard=[
 active_order_actions = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Список поставок', callback_data='view_shipments')],
     [InlineKeyboardButton(text='Все данные', callback_data='all_data_order')],
+    [InlineKeyboardButton(text='Отметить', callback_data='mark_order')],
     [InlineKeyboardButton(text='Отправить в архив', callback_data='close_order')],
 ])
 
