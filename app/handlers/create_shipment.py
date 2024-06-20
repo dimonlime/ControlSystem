@@ -130,7 +130,7 @@ async def create_shipment(message: Message, state: FSMContext):
                 media_list = [InputMediaPhoto(media=data['order'].order_image,
                                               caption=f'🔴*Оповещение о создании поставки*🔴\n'
                                                       f"*Артикул:* _{data['order'].internal_article}_\n"
-                                                      f"*Дата создания поставки:* _{data["shipment"].create_date}_\n"
+                                                      f"*Дата создания поставки:* _{data['shipment'].create_date}_\n"
                                                       f"*Кол-во товара* *S:* _{data['shipment'].quantity_s}_ *M:* _{data['shipment'].quantity_m}_ *L:* _{data['shipment'].quantity_l}_\n",
                                               parse_mode="Markdown"),
                               InputMediaPhoto(media=data['fish'].fish_image_id),
