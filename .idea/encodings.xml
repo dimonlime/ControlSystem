@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/admin_bot/admin_handlers.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin_bot/keyboards.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/app/database/requests/cheque_request.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/database/requests/fish_request.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/database/requests/product_card_request.py" charset="UTF-8" />

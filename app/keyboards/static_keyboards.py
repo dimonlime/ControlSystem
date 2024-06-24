@@ -5,6 +5,10 @@ from app import id_config
 from app.database import requests as rq
 
 
+admin_keyboard = ReplyKeyboardMarkup(keyboard=[
+    [KeyboardButton(text='Система учета'), KeyboardButton(text='Система ОДДС')],
+], resize_keyboard=True)
+
 recipient_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Создать поставку')],
     [KeyboardButton(text='Чеки')]

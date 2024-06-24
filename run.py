@@ -11,6 +11,7 @@ from app.handlers import (handlers, create_order, view_orders, add_product_card,
 from app.database.models import async_main
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from app.utils.time_update import fire_cheques_check
+from odds.app import handlers_odds
 
 # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
@@ -22,7 +23,7 @@ async def main():
     dp.include_routers(handlers.router, create_order.router, view_orders.router, add_product_card.router,
                        view_product_card.router, remove_product_card.router, create_shipment.router, create_cheque.router,
                        create_fish.router, archive_orders.router, change_shipment_status.router, view_shipment.router,
-                       cheques.router, article_info.router, edit_data.router)
+                       cheques.router, article_info.router, edit_data.router, handlers_odds.router)
     dotenv.load_dotenv()
     scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
     scheduler.add_job(fire_cheques_check, "interval", days=1)

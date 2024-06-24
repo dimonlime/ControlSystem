@@ -9,7 +9,6 @@ from app.database.requests import order_request as order_rq
 from app.database.requests import shipment_request as ship_rq
 from app.database.requests import cheque_request as cheque_rq
 from app.database.requests import fish_request as fish_rq
-from app.utils.utils import enough_quantity_order, shipments_quantity_s, shipments_quantity_m, shipments_quantity_l, shipments_ready
 
 from app.states.order import check_orders
 
