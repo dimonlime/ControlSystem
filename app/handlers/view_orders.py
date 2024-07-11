@@ -121,11 +121,11 @@ async def check_income_order_3(callback: CallbackQuery, state: FSMContext):
 async def check_income_order_4(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
-    if not await shipments_ready(data['order'].id):
-        await callback.message.answer('*Нельзя отправить заказ в архив, т.к не все поставки приняты на складе WB*', parse_mode='Markdown')
-    else:
-        await state.set_state(check_orders.close_order)
-        await callback.message.answer(f'*Не отправлено S:* _{data["remain_s"]}_ *M:* _{data["remain_m"]}_ *L:* _{data["remain_l"]}_\n'
+    # if not await shipments_ready(data['order'].id):
+    #     await callback.message.answer('*Нельзя отправить заказ в архив, т.к не все поставки приняты на складе WB*', parse_mode='Markdown')
+    # else:
+    await state.set_state(check_orders.close_order)
+    await callback.message.answer(f'*Не отправлено S:* _{data["remain_s"]}_ *M:* _{data["remain_m"]}_ *L:* _{data["remain_l"]}_\n'
                                       f'*Вы уверены, что хотите отправить заказ в архив?*', reply_markup=static_kb.close_order, parse_mode='Markdown')
 
 

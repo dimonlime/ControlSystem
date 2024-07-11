@@ -26,8 +26,13 @@ add_article_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Назад')]
 ], resize_keyboard=True)
 
+# orders_keyboard = ReplyKeyboardMarkup(keyboard=[
+#     [KeyboardButton(text='Текущие заказы'), KeyboardButton(text='Изменить статус поставки'), KeyboardButton(text='Архив заказов')],
+#     [KeyboardButton(text='Назад')],
+# ], resize_keyboard=True)
+
 orders_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='Текущие заказы'), KeyboardButton(text='Изменить статус поставки'), KeyboardButton(text='Архив заказов')],
+    [KeyboardButton(text='Текущие заказы'), KeyboardButton(text='Архив заказов')],
     [KeyboardButton(text='Назад')],
 ], resize_keyboard=True)
 
