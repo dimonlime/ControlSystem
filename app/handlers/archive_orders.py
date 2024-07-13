@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, Message, InputMediaPhoto, InputMediaDocument
+from aiogram.types import CallbackQuery, Message, InputMediaPhoto, InputMediaDocument, FSInputFile
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from app.id_config import senders
@@ -55,6 +55,6 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
         caption += f'🔴 *Не все поставки приняты на складе WB*\n'
     else:
         caption += f'🟢 *Все текущие поставки приняты на складе WB*\n'
-    media_list = [InputMediaPhoto(media=order.order_image, caption=caption, parse_mode="Markdown")]
+    media_list = [InputMediaPhoto(media=FSInputFile(path=order.order_image), caption=caption, parse_mode="Markdown")]
     await callback.message.answer_media_group(media=media_list)
     await callback.message.answer(f'Выберите действие', reply_markup=static_kb.archive_order_actions)

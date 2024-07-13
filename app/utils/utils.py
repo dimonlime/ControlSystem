@@ -3,6 +3,9 @@ from app.database.requests import product_card_request as card_rq
 from app.database.requests import order_request as order_rq
 from app.database.requests import shipment_request as ship_rq
 
+import os
+from bot_factory import bot
+
 
 async def half_year_check(date):
     today_date = datetime.now()
@@ -70,3 +73,14 @@ async def shipments_ready(order_id):
         if shipment.status != 'Принята на складе WB':
             return False
     return True
+
+
+async def download_file_func(file_id, file_path):
+    file = await bot.get_file(file_id)
+    destination = file_path
+    destination_file = os.path.join(destination, file.file_unique_id + '.jpg')
+    await bot.download_file(file.file_path, destination_file)
+
+    relative_path = rf'{file_path}\{file.file_unique_id}.jpg'
+    absolute_path = os.path.abspath(relative_path)
+    return absolute_path

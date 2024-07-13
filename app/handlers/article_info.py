@@ -55,7 +55,7 @@ async def get_article_info(callback: CallbackQuery, state: FSMContext):
         for order in orders:
             shipments = await ship_rq.get_shipments(order.id)
             for shipment in shipments:
-                if shipment.status != 'Принята на складе WB':
+                if order.status != 'Заказ готов':
                     sum_all += shipment.quantity_s + shipment.quantity_m + shipment.quantity_l
                     sum_s_all += shipment.quantity_s
                     sum_m_all += shipment.quantity_m
@@ -65,44 +65,44 @@ async def get_article_info(callback: CallbackQuery, state: FSMContext):
                     sum_s_send += shipment.quantity_s
                     sum_m_send += shipment.quantity_m
                     sum_l_send += shipment.quantity_l
-                if shipment.status == 'Пришла в Москву':
-                    sum_moscow += shipment.quantity_s + shipment.quantity_m + shipment.quantity_l
-                    sum_s_moscow += shipment.quantity_s
-                    sum_m_moscow += shipment.quantity_m
-                    sum_l_moscow += shipment.quantity_l
-                if shipment.status == 'Принята на складе ПД':
-                    sum_vendor += shipment.quantity_s + shipment.quantity_m + shipment.quantity_l
-                    sum_s_vendor += shipment.quantity_s
-                    sum_m_vendor += shipment.quantity_m
-                    sum_l_vendor += shipment.quantity_l
-                if shipment.status == 'Отправлена на склад WB':
-                    sum_wb += shipment.quantity_s + shipment.quantity_m + shipment.quantity_l
-                    sum_s_wb += shipment.quantity_s
-                    sum_m_wb += shipment.quantity_m
-                    sum_l_wb += shipment.quantity_l
+                # if shipment.status == 'Пришла в Москву':
+                #     sum_moscow += shipment.quantity_s + shipment.quantity_m + shipment.quantity_l
+                #     sum_s_moscow += shipment.quantity_s
+                #     sum_m_moscow += shipment.quantity_m
+                #     sum_l_moscow += shipment.quantity_l
+                # if shipment.status == 'Принята на складе ПД':
+                #     sum_vendor += shipment.quantity_s + shipment.quantity_m + shipment.quantity_l
+                #     sum_s_vendor += shipment.quantity_s
+                #     sum_m_vendor += shipment.quantity_m
+                #     sum_l_vendor += shipment.quantity_l
+                # if shipment.status == 'Отправлена на склад WB':
+                #     sum_wb += shipment.quantity_s + shipment.quantity_m + shipment.quantity_l
+                #     sum_s_wb += shipment.quantity_s
+                #     sum_m_wb += shipment.quantity_m
+                #     sum_l_wb += shipment.quantity_l
         text = (f'Артикул: {article}\n'
-               f'Всего: {sum_all} шт\n'
+               f'Всего в пути: {sum_all} шт\n'
                f'S: {sum_s_all} M: {sum_m_all} L: {sum_l_all}\n')
-        if sum_send != 0:
-            text += (f'----------------------------------\n'
-                    f'Статус: "Поставка отправлена"\n'
-                    f'Общее кол-во товара: {sum_send}\n'
-                    f'S: {sum_s_send} M: {sum_m_send} L: {sum_l_send}\n')
-        if sum_moscow != 0:
-            text += (f'----------------------------------\n'
-                     f'Статус: "Пришла в Москву"\n'
-                     f'Общее кол-во товара: {sum_moscow}\n'
-                     f'S: {sum_s_moscow} M: {sum_m_moscow} L: {sum_l_moscow}\n')
-        if sum_vendor != 0:
-            text += (f'----------------------------------\n'
-                     f'Статус: "Принята на складе ПД"\n'
-                     f'Общее кол-во товара: {sum_vendor}\n'
-                     f'S: {sum_s_vendor} M: {sum_m_vendor} L: {sum_l_vendor}\n')
-        if sum_wb != 0:
-            text += (f'----------------------------------\n'
-                     f'Статус: "Отправлена на склад WB"\n'
-                     f'Общее кол-во товара: {sum_wb}\n'
-                     f'S: {sum_s_wb} M: {sum_m_wb} L: {sum_l_wb}\n')
+        # if sum_send != 0:
+        #     text += (f'----------------------------------\n'
+        #             f'Статус: "Поставка отправлена"\n'
+        #             f'Общее кол-во товара: {sum_send}\n'
+        #             f'S: {sum_s_send} M: {sum_m_send} L: {sum_l_send}\n')
+        # if sum_moscow != 0:
+        #     text += (f'----------------------------------\n'
+        #              f'Статус: "Пришла в Москву"\n'
+        #              f'Общее кол-во товара: {sum_moscow}\n'
+        #              f'S: {sum_s_moscow} M: {sum_m_moscow} L: {sum_l_moscow}\n')
+        # if sum_vendor != 0:
+        #     text += (f'----------------------------------\n'
+        #              f'Статус: "Принята на складе ПД"\n'
+        #              f'Общее кол-во товара: {sum_vendor}\n'
+        #              f'S: {sum_s_vendor} M: {sum_m_vendor} L: {sum_l_vendor}\n')
+        # if sum_wb != 0:
+        #     text += (f'----------------------------------\n'
+        #              f'Статус: "Отправлена на склад WB"\n'
+        #              f'Общее кол-во товара: {sum_wb}\n'
+        #              f'S: {sum_s_wb} M: {sum_m_wb} L: {sum_l_wb}\n')
         await callback.message.answer(text, parse_mode='Markdown')
     except ValueError:
         await callback.message.answer('Ошибка, попробуйте еще раз')

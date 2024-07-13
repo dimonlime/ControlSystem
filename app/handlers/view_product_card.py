@@ -1,6 +1,6 @@
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
-from aiogram.types import Message, CallbackQuery, InputMediaPhoto
+from aiogram.types import Message, CallbackQuery, InputMediaPhoto, FSInputFile
 from aiogram.fsm.context import FSMContext
 from app.id_config import senders, recipients
 from app.keyboards import static_keyboards as static_kb
@@ -27,7 +27,7 @@ async def check_all_orders(callback: CallbackQuery, state: FSMContext):
     await state.update_data(card_id=card_id)
     product_card = await card_rq.get_product_card(card_id)
     media_list = []
-    media_list.append(InputMediaPhoto(media=product_card.image_id,
+    media_list.append(InputMediaPhoto(media=FSInputFile(path=product_card.image_id),
                                       caption=f'*Артикул:* _{product_card.article}_\n'
                                               f'*Внутренний артикул поставщика:* _{product_card.vendor_internal_article}_\n'
                                               f'*Цвет:* _{product_card.color}_\n'

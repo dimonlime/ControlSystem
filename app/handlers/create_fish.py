@@ -1,18 +1,12 @@
+import os
 from datetime import datetime
-from aiogram import F, Router
-from aiogram.types import CallbackQuery, Message, InputMediaPhoto
+from aiogram import Router
+from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
-from app.id_config import recipients
-from app.keyboards import async_keyboards as async_kb
-from app.keyboards import static_keyboards as static_kb
-from app.database.requests import order_request as order_rq
-from app.database.requests import cheque_request as cheque_rq
-from app.database.requests import fish_request as fish_rq
-from app.database.requests import shipment_request as ship_rq
-from app.database.requests import product_card_request as card_rq
-from app.utils.utils import product_card_exists
 
-from app.states.shipment import create_shipment_state, create_cheque_state, create_fish_state
+from app.utils.utils import download_file_func
+
+from app.states.shipment import create_shipment_state, create_fish_state
 
 
 router = Router()
@@ -70,7 +64,13 @@ async def insert_fish_sack_count(message: Message, state: FSMContext):
 @router.message(create_fish_state.insert_fish_image)
 async def insert_fish_image(message: Message, state: FSMContext):
     try:
-        await state.update_data(fish_image=message.photo[-1].file_id)
+
+        folder_path = os.getenv('FIS`_PATH')
+        image_id = message.photo[-1].file_id
+
+        path = await download_file_func(image_id, folder_path)
+
+        await state.update_data(fish_image=path)
         await message.answer('Теперь нужно заполнить данные поставки')
         await message.answer('Введите кол-во отправляемого товара размера S:')
         await state.set_state(create_shipment_state.insert_quantity_s)

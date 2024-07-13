@@ -4,3 +4,4 @@ db1.sqlite3
 app/id_config.py
 odds/config/config.json
 odds/excel_files/report_ODDS.xlsx
+images

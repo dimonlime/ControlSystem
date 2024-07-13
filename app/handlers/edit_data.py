@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, Message, InputMediaPhoto, InputMediaDocument
+from aiogram.types import CallbackQuery, Message, InputMediaPhoto, InputMediaDocument, FSInputFile
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from app.id_config import senders
@@ -209,58 +209,58 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
                f'*Кол-во мешков:* _{str(fish.sack_count)}_\n'
                f'*Способ отправки:* _{str(fish.sending_method)}_\n')
     if shipment.status == 'Поставка отправлена':
-        media_list.append(InputMediaPhoto(media=data['order'].order_image, caption=caption, parse_mode="Markdown"))
-        media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
-        media_list.append(InputMediaPhoto(media=fish.fish_image_id))
+        media_list.append(InputMediaPhoto(media=FSInputFile(path=data['order'].order_image), caption=caption, parse_mode="Markdown"))
+        media_list.append(InputMediaPhoto(media=FSInputFile(path=cheque.cheque_image_id)))
+        media_list.append(InputMediaPhoto(media=FSInputFile(path=fish.fish_image_id)))
         if cheque.payment_image is not None:
-            media_list.append(InputMediaPhoto(media=cheque.payment_image))
+            media_list.append(InputMediaPhoto(media=FSInputFile(path=cheque.payment_image)))
         await callback.message.answer_media_group(media=media_list)
         await callback.message.answer('Выберите действие', reply_markup=static_kb.edit_shipment)
-    elif shipment.status == 'Пришла в Москву':
-        media_list.append(InputMediaPhoto(media=data['order'].order_image, caption=caption, parse_mode="Markdown"))
-        media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
-        media_list.append(InputMediaPhoto(media=fish.fish_image_id))
-        if cheque.payment_image is not None:
-            media_list.append(InputMediaPhoto(media=cheque.payment_image))
-        media_list.append(InputMediaPhoto(media=shipment.image_1_id))
-        await callback.message.answer_media_group(media=media_list)
-        await callback.message.answer('Выберите действие', reply_markup=static_kb.edit_shipment)
-    elif shipment.status == 'Принята на складе ПД':
-        media_list.append(InputMediaPhoto(media=data['order'].order_image, caption=caption, parse_mode="Markdown"))
-        media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
-        media_list.append(InputMediaPhoto(media=fish.fish_image_id))
-        if cheque.payment_image is not None:
-            media_list.append(InputMediaPhoto(media=cheque.payment_image))
-        media_list.append(InputMediaPhoto(media=shipment.image_1_id))
-        document_list.append(InputMediaDocument(media=shipment.document_1_id))
-        await callback.message.answer_media_group(media=media_list)
-        await callback.message.answer_media_group(media=document_list)
-        await callback.message.answer('Выберите действие', reply_markup=static_kb.edit_shipment)
-    elif shipment.status == 'Отправлена на склад WB':
-        media_list.append(InputMediaPhoto(media=data['order'].order_image, caption=caption, parse_mode="Markdown"))
-        media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
-        media_list.append(InputMediaPhoto(media=fish.fish_image_id))
-        if cheque.payment_image is not None:
-            media_list.append(InputMediaPhoto(media=cheque.payment_image))
-        media_list.append(InputMediaPhoto(media=shipment.image_1_id))
-        media_list.append(InputMediaPhoto(media=shipment.image_2_id))
-        document_list.append(InputMediaDocument(media=shipment.document_1_id))
-        await callback.message.answer_media_group(media=media_list)
-        await callback.message.answer_media_group(media=document_list)
-        await callback.message.answer('Выберите действие', reply_markup=static_kb.edit_shipment)
-    elif shipment.status == 'Принята на складе WB':
-        media_list.append(InputMediaPhoto(media=data['order'].order_image, caption=caption, parse_mode="Markdown"))
-        media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
-        media_list.append(InputMediaPhoto(media=fish.fish_image_id))
-        if cheque.payment_image is not None:
-            media_list.append(InputMediaPhoto(media=cheque.payment_image))
-        media_list.append(InputMediaPhoto(media=shipment.image_1_id))
-        media_list.append(InputMediaPhoto(media=shipment.image_2_id))
-        document_list.append(InputMediaDocument(media=shipment.document_1_id))
-        document_list.append(InputMediaDocument(media=shipment.document_2_id))
-        await callback.message.answer_media_group(media=media_list)
-        await callback.message.answer_media_group(media=document_list)
-        await callback.message.answer('Выберите действие', reply_markup=static_kb.edit_shipment)
+    # elif shipment.status == 'Пришла в Москву':
+    #     media_list.append(InputMediaPhoto(media=data['order'].order_image, caption=caption, parse_mode="Markdown"))
+    #     media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
+    #     media_list.append(InputMediaPhoto(media=fish.fish_image_id))
+    #     if cheque.payment_image is not None:
+    #         media_list.append(InputMediaPhoto(media=cheque.payment_image))
+    #     media_list.append(InputMediaPhoto(media=shipment.image_1_id))
+    #     await callback.message.answer_media_group(media=media_list)
+    #     await callback.message.answer('Выберите действие', reply_markup=static_kb.edit_shipment)
+    # elif shipment.status == 'Принята на складе ПД':
+    #     media_list.append(InputMediaPhoto(media=data['order'].order_image, caption=caption, parse_mode="Markdown"))
+    #     media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
+    #     media_list.append(InputMediaPhoto(media=fish.fish_image_id))
+    #     if cheque.payment_image is not None:
+    #         media_list.append(InputMediaPhoto(media=cheque.payment_image))
+    #     media_list.append(InputMediaPhoto(media=shipment.image_1_id))
+    #     document_list.append(InputMediaDocument(media=shipment.document_1_id))
+    #     await callback.message.answer_media_group(media=media_list)
+    #     await callback.message.answer_media_group(media=document_list)
+    #     await callback.message.answer('Выберите действие', reply_markup=static_kb.edit_shipment)
+    # elif shipment.status == 'Отправлена на склад WB':
+    #     media_list.append(InputMediaPhoto(media=data['order'].order_image, caption=caption, parse_mode="Markdown"))
+    #     media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
+    #     media_list.append(InputMediaPhoto(media=fish.fish_image_id))
+    #     if cheque.payment_image is not None:
+    #         media_list.append(InputMediaPhoto(media=cheque.payment_image))
+    #     media_list.append(InputMediaPhoto(media=shipment.image_1_id))
+    #     media_list.append(InputMediaPhoto(media=shipment.image_2_id))
+    #     document_list.append(InputMediaDocument(media=shipment.document_1_id))
+    #     await callback.message.answer_media_group(media=media_list)
+    #     await callback.message.answer_media_group(media=document_list)
+    #     await callback.message.answer('Выберите действие', reply_markup=static_kb.edit_shipment)
+    # elif shipment.status == 'Принята на складе WB':
+    #     media_list.append(InputMediaPhoto(media=data['order'].order_image, caption=caption, parse_mode="Markdown"))
+    #     media_list.append(InputMediaPhoto(media=cheque.cheque_image_id))
+    #     media_list.append(InputMediaPhoto(media=fish.fish_image_id))
+    #     if cheque.payment_image is not None:
+    #         media_list.append(InputMediaPhoto(media=cheque.payment_image))
+    #     media_list.append(InputMediaPhoto(media=shipment.image_1_id))
+    #     media_list.append(InputMediaPhoto(media=shipment.image_2_id))
+    #     document_list.append(InputMediaDocument(media=shipment.document_1_id))
+    #     document_list.append(InputMediaDocument(media=shipment.document_2_id))
+    #     await callback.message.answer_media_group(media=media_list)
+    #     await callback.message.answer_media_group(media=document_list)
+    #     await callback.message.answer('Выберите действие', reply_markup=static_kb.edit_shipment)
 
 
 @router.callback_query(F.data == 'edit_quantity_s', edit_shipment.edit_value)

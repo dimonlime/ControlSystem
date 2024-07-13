@@ -1,6 +1,6 @@
 from datetime import datetime
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, Message, InputMediaPhoto
+from aiogram.types import CallbackQuery, Message, InputMediaPhoto, FSInputFile
 from aiogram.fsm.context import FSMContext
 from app.id_config import senders, recipients
 from app.keyboards import async_keyboards as async_kb
@@ -97,7 +97,7 @@ async def insert_image_auto(message: Message, state: FSMContext):
     chat_ids = senders + recipients
     for chat_id in chat_ids:
         if chat_id != message.chat.id:
-            media_list = [InputMediaPhoto(media=data['order_image'],
+            media_list = [InputMediaPhoto(media=FSInputFile(path=data['order_image']),
                                           caption=f'🔴*Оповещение о создании заказа*🔴\n'
                                                   f"*Артикул:* _{data['internal_article']}_\n"
                                                   f"*Дата создания заказа:* _{data['create_date']}_\n"

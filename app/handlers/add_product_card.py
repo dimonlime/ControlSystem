@@ -1,11 +1,14 @@
+import os
+
 from aiogram import Router, F
-from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
-from app.id_config import senders, recipients
-from app.keyboards import static_keyboards as static_kb
+from app.id_config import senders
 from app.states.product_card import create_product_card
 from app.database.requests import product_card_request as card_rq
+
+from app.utils.utils import download_file_func
+
 
 router = Router()
 
@@ -52,10 +55,23 @@ async def insert_article_id(message: Message, state: FSMContext):
 @router.message(create_product_card.insert_image)
 async def insert_article_image(message: Message, state: FSMContext):
     try:
+        folder_path = os.getenv('PRODUCT_CARD_PATH')
         image_id = message.photo[-1].file_id
         await state.update_data(image_id=image_id)
+
+
+        # file = await bot.get_file(image_id)
+        # destination = folder_path
+        # destination_file = os.path.join(destination, file.file_unique_id + '.jpg')
+        # await bot.download_file(file.file_path, destination_file)
+        #
+        # relative_path = rf'{folder_path}\{file.file_unique_id}.jpg'
+        # absolute_path = os.path.abspath(relative_path)
+
+        path = await download_file_func(image_id, folder_path)
+
         data = await state.get_data()
-        await card_rq.create_product_card(data['article'], data['vendor_internal_article'], data['color'], data['shop_name'], data['image_id'])
+        await card_rq.create_product_card(data['article'], data['vendor_internal_article'], data['color'], data['shop_name'], path)
         await message.answer('Карточка товара успешно создана')
         await state.clear()
     except ValueError:

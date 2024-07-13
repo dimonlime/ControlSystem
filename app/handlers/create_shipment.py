@@ -1,6 +1,6 @@
 from datetime import datetime
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, Message, InputMediaPhoto
+from aiogram.types import CallbackQuery, Message, InputMediaPhoto, FSInputFile
 from aiogram.fsm.context import FSMContext
 from app.id_config import recipients, senders
 from app.keyboards import async_keyboards as async_kb
@@ -39,7 +39,7 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
     remain_m = order.quantity_m - ship_m
     remain_l = order.quantity_l - ship_l
     order_create_date = datetime.strptime(order.create_date, "%d-%m-%Y %H:%M:%S")
-    media_list = [InputMediaPhoto(media=order.order_image,
+    media_list = [InputMediaPhoto(media=FSInputFile(path=order.order_image),
                                   caption=f'*Артикул:* _{order.internal_article}_\n'
                                           f'*Дата создания заказа:* _{datetime.strftime(order_create_date, "%d-%m-%Y %H:%M")}_\n'
                                           f'*S:* _{order.quantity_s} _*M:* _{order.quantity_m}_ *L:* _{order.quantity_l}_\n'
@@ -127,14 +127,14 @@ async def create_shipment(message: Message, state: FSMContext):
         data = await state.get_data()
         for chat_id in senders:
             if chat_id != message.chat.id:
-                media_list = [InputMediaPhoto(media=data['order'].order_image,
+                media_list = [InputMediaPhoto(media=FSInputFile(path=data['order'].order_image),
                                               caption=f'🔴*Оповещение о создании поставки*🔴\n'
                                                       f"*Артикул:* _{data['order'].internal_article}_\n"
                                                       f"*Дата создания поставки:* _{data['shipment'].create_date}_\n"
                                                       f"*Кол-во товара* *S:* _{data['shipment'].quantity_s}_ *M:* _{data['shipment'].quantity_m}_ *L:* _{data['shipment'].quantity_l}_\n",
                                               parse_mode="Markdown"),
-                              InputMediaPhoto(media=data['fish'].fish_image_id),
-                              InputMediaPhoto(media=data['cheque'].cheque_image_id)]
+                              InputMediaPhoto(media=FSInputFile(path=data['fish'].fish_image_id)),
+                              InputMediaPhoto(media=FSInputFile(path=data['cheque'].cheque_image_id))]
                 await message.bot.send_media_group(media=media_list, chat_id=chat_id)
         await state.clear()
     except ValueError:

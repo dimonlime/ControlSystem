@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from app.id_config import senders, recipients
 from app.keyboards import static_keyboards as static_kb
 from app.keyboards import async_keyboards as async_kb
-from aiogram.types import CallbackQuery, Message, InputMediaPhoto, InputMediaDocument
+from aiogram.types import CallbackQuery, Message, InputMediaPhoto, InputMediaDocument, FSInputFile
 from app.database.requests import cheque_request as cheque_rq
 from app.database.requests import order_request as order_rq
 from app.database.requests import fish_request as fish_rq
@@ -55,7 +55,7 @@ async def view_cheque(callback: CallbackQuery, state: FSMContext):
     elif cheque.cheque_status == 'По чеку имеется отсрочка':
         caption += f'🟠*Статус:* _{cheque.cheque_status}_'
     await callback.message.answer_photo(caption=caption,
-                                        photo=cheque.cheque_image_id, reply_markup=reply_markup, parse_mode="Markdown")
+                                        photo=FSInputFile(path=cheque.cheque_image_id), reply_markup=reply_markup, parse_mode="Markdown")
 
 
 @router.callback_query(F.data == 'pay_cheque')
@@ -77,14 +77,14 @@ async def check_all_orders(message: Message, state: FSMContext):
         data = await state.get_data()
         for chat_id in recipients:
             if chat_id != message.chat.id:
-                media_list = [InputMediaPhoto(media=data['cheque'].cheque_image_id,
+                media_list = [InputMediaPhoto(media=FSInputFile(path=data['cheque'].cheque_image_id),
                                               caption=f'🔴*Оповещение об оплате чека*🔴\n'
                                                       f"*Арт:* _{data['order'].internal_article}_\n"
                                                       f"*Цена:* _{data['cheque'].price}_*$*\n"
                                                       f"*Дата чека:* _{data['cheque'].date}_\n"
                                                       f"*Кол-во товара* *S:* _{data['shipment'].quantity_s}_ *M:* _{data['shipment'].quantity_m}_ *L:* _{data['shipment'].quantity_l}_\n",
                                               parse_mode="Markdown"),
-                              InputMediaPhoto(media=data['cheque'].payment_image)]
+                              InputMediaPhoto(media=FSInputFile(path=data['cheque'].payment_image))]
                 await message.bot.send_media_group(media=media_list, chat_id=chat_id)
     except ValueError:
         await message.answer('Ошибка, попробуйте еще раз')
@@ -98,12 +98,12 @@ async def view_cheque(callback: CallbackQuery, state: FSMContext):
     shipment = await ship_rq.get_shipment(cheque.shipment_id)
     order = await order_rq.get_order(shipment.order_id)
     media_list = []
-    media_list.append(InputMediaPhoto(media=cheque.cheque_image_id,
+    media_list.append(InputMediaPhoto(media=FSInputFile(path=cheque.cheque_image_id),
                                       caption=
                                       f'*Цена* _{cheque.price}_*$*\n'
                                       f'*Дата* _{cheque.date}_\n'
                                       f'*Арт:* _{order.internal_article}_\n'
                                       f'*S:* _{shipment.quantity_s}_ *M:* _{shipment.quantity_m}_ *L:* _{shipment.quantity_l}_\n'
                                       f'🟢*Статус:* _{cheque.cheque_status}_', parse_mode="Markdown"))
-    media_list.append(InputMediaPhoto(media=cheque.payment_image))
+    media_list.append(InputMediaPhoto(media=FSInputFile(path=cheque.payment_image)))
     await callback.message.answer_media_group(media=media_list)
