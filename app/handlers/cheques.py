@@ -1,3 +1,5 @@
+import os
+
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, CallbackQuery
@@ -11,6 +13,7 @@ from app.database.requests import order_request as order_rq
 from app.database.requests import fish_request as fish_rq
 from app.database.requests import shipment_request as ship_rq
 from app.states.cheque import view_cheque_state
+from app.utils.utils import download_file_func
 
 router = Router()
 
@@ -68,9 +71,14 @@ async def view_cheque(callback: CallbackQuery, state: FSMContext):
 @router.message(view_cheque_state.insert_payment_image)
 async def check_all_orders(message: Message, state: FSMContext):
     try:
-        payment_image_id = message.photo[-1].file_id
+
+        folder_path = os.getenv('PAYMENT_IMG_PATH')
+        image_id = message.photo[-1].file_id
+
+        path = await download_file_func(image_id, folder_path)
+
         data = await state.get_data()
-        await cheque_rq.insert_payment_image(data['cheque'].id, payment_image_id)
+        await cheque_rq.insert_payment_image(data['cheque'].id, path)
         await message.answer('Чек оплачен успешно')
         cheque = await cheque_rq.get_cheque_2(data['cheque'].id)
         await state.update_data(cheque=cheque)
