@@ -81,6 +81,6 @@ async def download_file_func(file_id, file_path):
     destination_file = os.path.join(destination, file.file_unique_id + '.jpg')
     await bot.download_file(file.file_path, destination_file)
 
-    relative_path = rf'{file_path}\{file.file_unique_id}.jpg'
+    relative_path = rf'{file_path}/{file.file_unique_id}.jpg'
     absolute_path = os.path.abspath(relative_path)
     return absolute_path
