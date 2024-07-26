@@ -8,7 +8,8 @@ from app.id_config import senders
 from app.keyboards import async_keyboards as async_kb
 from app.keyboards import static_keyboards as static_kb
 from app.database.requests import order_request as order_rq
-from app.utils.utils import enough_quantity_order, shipments_quantity_s, shipments_quantity_m, shipments_quantity_l, shipments_ready
+from app.utils.utils import enough_quantity_order, shipments_quantity_s, shipments_quantity_m, shipments_quantity_l, \
+    shipments_ready, shipments_quantity_xs
 
 from app.states.order import archive_orders
 
@@ -29,6 +30,7 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
     order_id = str(callback.data)[9:]
     order = await order_rq.get_order(order_id)
     await state.update_data(order=order)
+    ship_xs = await shipments_quantity_xs(order_id)
     ship_s = await shipments_quantity_s(order_id)
     ship_m = await shipments_quantity_m(order_id)
     ship_l = await shipments_quantity_l(order_id)
@@ -38,17 +40,18 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
                f'*Цвет:* _{order.color}_\n'
                f'*Название магазина:* _{order.shop_name}_\n'
                f'*Способ отправки:* _{order.sending_method}_\n'
-               f'*Заказано:* *S:* _{order.quantity_s}_ *M:* _{order.quantity_m}_ *L:* _{order.quantity_l}_\n'
-               f'*Отправлено:* *S:* _{ship_s}_ *M:* _{ship_m}_ *L:* _{ship_l}_\n')
+               f'*Заказано:* *XS:* _{order.quantity_xs}_ *S:* _{order.quantity_s}_ *M:* _{order.quantity_m}_ *L:* _{order.quantity_l}_\n'
+               f'*Отправлено:* *XS:* _{ship_xs}_ *S:* _{ship_s}_ *M:* _{ship_m}_ *L:* _{ship_l}_\n')
     if order.status != 'Заказ готов':
         caption += f'🔴 *Заказ не готов*\n'
     else:
         caption += f'🟢 *Заказ готов*\n'
     if not await enough_quantity_order(order_id):
+        remain_xs = order.quantity_xs - ship_xs
         remain_s = order.quantity_s - ship_s
         remain_m = order.quantity_m - ship_m
         remain_l = order.quantity_l - ship_l
-        caption += f'🔴 *Не отправлено* *S:* _{remain_s}_ *M:* _{remain_m}_ *L:* _{remain_l}_\n'
+        caption += f'🔴 *Не отправлено* *XS:* _{remain_xs}_ *S:* _{remain_s}_ *M:* _{remain_m}_ *L:* _{remain_l}_\n'
     else:
         caption += f'🟢 *Заказанное кол-во отправлено*\n'
     if not await shipments_ready(order_id):

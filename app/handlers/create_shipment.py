@@ -63,6 +63,17 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
                                   f'Пример: {datetime.now().strftime("%d-%m-%Y %H:%M")}')
 
 
+@router.message(create_shipment_state.insert_quantity_xs)
+async def insert_fish_image(message: Message, state: FSMContext):
+    try:
+        quantity_xs = int(message.text)
+        await state.update_data(shipment_quantity_xs=quantity_xs)
+        await message.answer('Введите кол-во отправляемого товара размера S:')
+        await state.set_state(create_shipment_state.insert_quantity_s)
+    except TypeError:
+        await message.answer('Ошибка, попробуйте еще раз')
+
+
 @router.message(create_shipment_state.insert_quantity_s)
 async def insert_fish_image(message: Message, state: FSMContext):
     try:
@@ -114,7 +125,7 @@ async def create_shipment(message: Message, state: FSMContext):
         await state.update_data(cheque=cheque.first())
         await state.update_data(fish=fish.first())
         data = await state.get_data()
-        await ship_rq.create_shipment_db(data['order_id'], data['shipment_create_date'], data['shipment_quantity_s'],
+        await ship_rq.create_shipment_db(data['order_id'], data['shipment_create_date'], data['shipment_quantity_xs'], data['shipment_quantity_s'],
                                          data['shipment_quantity_m'], data['shipment_quantity_l'], data['order'].sending_method,
                                          data['fish'].id, data['cheque'].id)
         shipment = await ship_rq.get_last_ship(data['order'].id)

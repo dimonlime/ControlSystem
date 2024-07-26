@@ -3,6 +3,7 @@ from aiogram.fsm.state import StatesGroup, State
 
 class create_shipment_state(StatesGroup):
     select_order = State()
+    insert_quantity_xs = State()
     insert_quantity_s = State()
     insert_quantity_m = State()
     insert_quantity_l = State()

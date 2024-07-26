@@ -48,7 +48,7 @@ async def view_cheque(callback: CallbackQuery, state: FSMContext):
     caption = (f'*Цена* _{cheque.price}_*$*\n'
                f'*Дата* _{cheque.date}_\n'
                f'*Арт:* _{order.internal_article}_\n'
-               f'*S:* _{shipment.quantity_s}_ *M:* _{shipment.quantity_m}_ *L:* _{shipment.quantity_l}_\n')
+               f'*XS:* _{shipment.quantity_xs}_ *S:* _{shipment.quantity_s}_ *M:* _{shipment.quantity_m}_ *L:* _{shipment.quantity_l}_\n')
     if callback.from_user.id in senders:
         reply_markup = static_kb.pay_cheque
     elif callback.from_user.id in recipients:
@@ -90,7 +90,7 @@ async def check_all_orders(message: Message, state: FSMContext):
                                                       f"*Арт:* _{data['order'].internal_article}_\n"
                                                       f"*Цена:* _{data['cheque'].price}_*$*\n"
                                                       f"*Дата чека:* _{data['cheque'].date}_\n"
-                                                      f"*Кол-во товара* *S:* _{data['shipment'].quantity_s}_ *M:* _{data['shipment'].quantity_m}_ *L:* _{data['shipment'].quantity_l}_\n",
+                                                      f"*Кол-во товара* *XS:* _{data['shipment'].quantity_xs}_ *S:* _{data['shipment'].quantity_s}_ *M:* _{data['shipment'].quantity_m}_ *L:* _{data['shipment'].quantity_l}_\n",
                                               parse_mode="Markdown"),
                               InputMediaPhoto(media=FSInputFile(path=data['cheque'].payment_image))]
                 await message.bot.send_media_group(media=media_list, chat_id=chat_id)
@@ -111,7 +111,7 @@ async def view_cheque(callback: CallbackQuery, state: FSMContext):
                                       f'*Цена* _{cheque.price}_*$*\n'
                                       f'*Дата* _{cheque.date}_\n'
                                       f'*Арт:* _{order.internal_article}_\n'
-                                      f'*S:* _{shipment.quantity_s}_ *M:* _{shipment.quantity_m}_ *L:* _{shipment.quantity_l}_\n'
+                                      f'*XS:* _{shipment.quantity_xs}_ *S:* _{shipment.quantity_s}_ *M:* _{shipment.quantity_m}_ *L:* _{shipment.quantity_l}_\n'
                                       f'🟢*Статус:* _{cheque.cheque_status}_', parse_mode="Markdown"))
     media_list.append(InputMediaPhoto(media=FSInputFile(path=cheque.payment_image)))
     await callback.message.answer_media_group(media=media_list)

@@ -72,7 +72,7 @@ async def insert_fish_image(message: Message, state: FSMContext):
 
         await state.update_data(fish_image=path)
         await message.answer('Теперь нужно заполнить данные поставки')
-        await message.answer('Введите кол-во отправляемого товара размера S:')
-        await state.set_state(create_shipment_state.insert_quantity_s)
+        await message.answer('Введите кол-во отправляемого товара размера XS:')
+        await state.set_state(create_shipment_state.insert_quantity_xs)
     except TypeError:
         await message.answer('Ошибка, попробуйте еще раз')

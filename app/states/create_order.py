@@ -4,6 +4,7 @@ from aiogram.fsm.state import StatesGroup, State
 class create_order_state(StatesGroup):
     insert_internal_article = State()
     insert_date_order = State()
+    insert_xs_order = State()
     insert_s_order = State()
     insert_m_order = State()
     insert_l_order = State()

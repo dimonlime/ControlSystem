@@ -35,7 +35,7 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
     media_list = []
     document_list = []
     caption = (f'*Дата отправки:* _{shipment.create_date}_\n'
-               f'*Кол-во товара S:* _{shipment.quantity_s}_ M: _{shipment.quantity_m}_ L: _{shipment.quantity_l}_\n'
+               f'*Кол-во товара XS:* _{shipment.quantity_xs}_ S:* _{shipment.quantity_s}_ M: _{shipment.quantity_m}_ L: _{shipment.quantity_l}_\n'
                f'*Статус:* _{shipment.status}_\n')
     if shipment.status == 'Поставка отправлена':
         media_list.append(InputMediaPhoto(media=FSInputFile(path=data['order'].order_image), caption=caption, parse_mode="Markdown"))

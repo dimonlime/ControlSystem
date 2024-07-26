@@ -33,13 +33,24 @@ async def insert_internal_article(callback: CallbackQuery, state: FSMContext):
             await state.update_data(color=product_card.color)
             await state.update_data(shop_name=product_card.shop_name)
             await state.update_data(order_image=product_card.image_id)
-            await state.set_state(create_order_state.insert_s_order)
-            await callback.message.answer('Введите кол-во товара размера S:')
+            await state.set_state(create_order_state.insert_xs_order)
+            await callback.message.answer('Введите кол-во товара размера XS:')
         else:
             await callback.message.answer('Для данного артикула не создана карточка товара, воспользуйтесь командой '
                                           '/create_product_card, чтобы создать ее')
     except ValueError:
         await callback.message.answer('Ошибка, попробуйте еще раз')
+
+
+@router.message(create_order_state.insert_xs_order)
+async def insert_quantity_s(message: Message, state: FSMContext):
+    try:
+        quantity_xs = int(message.text)
+        await state.update_data(quantity_xs=quantity_xs)
+        await state.set_state(create_order_state.insert_s_order)
+        await message.answer('Введите кол-во товара размера S:')
+    except ValueError:
+        await message.answer('Введите целое число')
 
 
 @router.message(create_order_state.insert_s_order)
@@ -91,7 +102,7 @@ async def insert_image_auto(message: Message, state: FSMContext):
     await state.update_data(change_date=change_date)
     data = await state.get_data()
     await order_rq.create_order_db(data['create_date'], data['change_date'], data['internal_article'], data['vendor_internal_article'],
-                                   data['quantity_s'], data['quantity_m'], data['quantity_l'], data['color'], data['shop_name'],
+                                   data['quantity_xs'], data['quantity_s'], data['quantity_m'], data['quantity_l'], data['color'], data['shop_name'],
                                    data['sending_method'], data['order_image'])
     await message.answer('Заказ создан успешно')
     chat_ids = senders + recipients
@@ -101,7 +112,7 @@ async def insert_image_auto(message: Message, state: FSMContext):
                                           caption=f'🔴*Оповещение о создании заказа*🔴\n'
                                                   f"*Артикул:* _{data['internal_article']}_\n"
                                                   f"*Дата создания заказа:* _{data['create_date']}_\n"
-                                                  f"*Кол-во товара* *S:* _{data['quantity_s']}_ *M:* _{data['quantity_m']}_ *L:* _{data['quantity_l']}_\n",
+                                                  f"*Кол-во товара* *XS:* _{data['quantity_xs']}_ *S:* _{data['quantity_s']}_ *M:* _{data['quantity_m']}_ *L:* _{data['quantity_l']}_\n",
                                           parse_mode="Markdown")]
             await message.bot.send_media_group(media=media_list, chat_id=chat_id)
     await state.clear()

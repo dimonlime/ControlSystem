@@ -5,11 +5,11 @@ from app.database.models import Cheque, Order, Fish, ProductCard
 from sqlalchemy import select
 
 
-async def create_order_db(create_date, change_date, internal_article, vendor_internal_article, quantity_s, quantity_m,
+async def create_order_db(create_date, change_date, internal_article, vendor_internal_article, quantity_xs, quantity_s, quantity_m,
                           quantity_l, color, shop_name, sending_method, order_image):
     async with async_session() as session:
         session.add(Order(create_date=create_date, change_date=change_date, internal_article=internal_article,
-                          vendor_internal_article=vendor_internal_article, quantity_s=quantity_s, quantity_m=quantity_m,
+                          vendor_internal_article=vendor_internal_article, quantity_xs=quantity_xs, quantity_s=quantity_s, quantity_m=quantity_m,
                           quantity_l=quantity_l, color=color, shop_name=shop_name, sending_method=sending_method,
                           order_image=order_image))
         await session.commit()

@@ -40,6 +40,14 @@ async def enough_quantity_order(order_id):
     return False
 
 
+async def shipments_quantity_xs(order_id):
+    shipments = await ship_rq.get_shipments(order_id)
+    shipment_xs = 0
+    for shipment in shipments:
+        shipment_xs += shipment.quantity_xs
+    return shipment_xs
+
+
 async def shipments_quantity_s(order_id):
     shipments = await ship_rq.get_shipments(order_id)
     shipment_s = 0

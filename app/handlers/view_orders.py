@@ -11,7 +11,8 @@ from app.database.requests import order_request as order_rq
 from app.database.requests import shipment_request as ship_rq
 from app.database.requests import cheque_request as cheque_rq
 from app.database.requests import fish_request as fish_rq
-from app.utils.utils import enough_quantity_order, shipments_quantity_s, shipments_quantity_m, shipments_quantity_l, shipments_ready
+from app.utils.utils import enough_quantity_order, shipments_quantity_s, shipments_quantity_m, shipments_quantity_l, \
+    shipments_ready, shipments_quantity_xs
 
 from app.states.order import check_orders
 
@@ -32,6 +33,7 @@ async def check_income_order_1(callback: CallbackQuery, state: FSMContext):
     order_id = str(callback.data)[9:]
     order = await order_rq.get_order(order_id)
     await state.update_data(order=order, callback=callback, state=state)
+    ship_xs = await shipments_quantity_xs(order_id)
     ship_s = await shipments_quantity_s(order_id)
     ship_m = await shipments_quantity_m(order_id)
     ship_l = await shipments_quantity_l(order_id)
@@ -44,18 +46,19 @@ async def check_income_order_1(callback: CallbackQuery, state: FSMContext):
                f'*Цвет:* _{order.color}_\n'
                f'*Название магазина:* _{order.shop_name}_\n'
                f'*Способ отправки:* _{order.sending_method}_\n'
-               f'*Заказано:* *S:* _{order.quantity_s}_ *M:* _{order.quantity_m}_ *L:* _{order.quantity_l}_\n'
-               f'*Отправлено:* *S:* _{ship_s}_ *M:* _{ship_m}_ *L:* _{ship_l}_\n')
+               f'*Заказано:* *XS:* _{order.quantity_xs}_ *S:* _{order.quantity_s}_ *M:* _{order.quantity_m}_ *L:* _{order.quantity_l}_\n'
+               f'*Отправлено:* *XS:* _{ship_xs}_ *S:* _{ship_s}_ *M:* _{ship_m}_ *L:* _{ship_l}_\n')
     if order.status != 'Заказ готов':
         caption += f'🔴 *Заказ не готов*\n'
     else:
         caption += f'🟢 *Заказ готов*\n'
     if not await enough_quantity_order(order_id):
+        remain_xs = order.quantity_xs - ship_xs
         remain_s = order.quantity_s - ship_s
         remain_m = order.quantity_m - ship_m
         remain_l = order.quantity_l - ship_l
-        await state.update_data(remain_s=remain_s, remain_m=remain_m, remain_l=remain_l)
-        caption += f'🔴 *Ожидается* *S:* _{remain_s}_ *M:* _{remain_m}_ *L:* _{remain_l}_\n'
+        await state.update_data(remain_xs=remain_xs, remain_s=remain_s, remain_m=remain_m, remain_l=remain_l)
+        caption += f'🔴 *Ожидается* *XS:* _{remain_xs}_ *S:* _{remain_s}_ *M:* _{remain_m}_ *L:* _{remain_l}_\n'
     else:
         caption += f'🟢 *Заказанное кол-во отправлено*\n'
     if not await shipments_ready(order_id):
@@ -77,7 +80,7 @@ async def check_income_order_2(callback: CallbackQuery, state: FSMContext):
     text = (f'------Данные поставки------\n'
             f'*Дата отправки:* _{shipment.create_date}_\n'
             f'*Дата последнего изменения:* _{shipment.change_date}_\n'
-            f'*Кол-во товара S:* _{shipment.quantity_s}_ M: _{shipment.quantity_m}_ L: _{shipment.quantity_l}_\n'
+            f'*Кол-во товара XS:* _{shipment.quantity_xs}_ S:* _{shipment.quantity_s}_ M: _{shipment.quantity_m}_ L: _{shipment.quantity_l}_\n'
             f'*Статус:* _{shipment.status}_\n'
             f'*Способ отправки:* _{shipment.sending_method}_\n'
             f'------Данные чека------\n'
@@ -107,6 +110,7 @@ async def check_income_order_3(callback: CallbackQuery, state: FSMContext):
             f'*Дата последнего изменения заказа:* _{str(order.change_date)}_\n'
             f'*Внутренний артикул товара:* _{str(order.internal_article)}_\n'
             f'*Внутренний артикул поставщика:* _{str(order.vendor_internal_article)}_\n'
+            f'*Кол-во товара размера XS:* _{str(order.quantity_xs)}_\n'
             f'*Кол-во товара размера S:* _{str(order.quantity_s)}_\n'
             f'*Кол-во товара размера M:* _{str(order.quantity_m)}_\n'
             f'*Кол-во товара размера L:* _{str(order.quantity_l)}_\n'
@@ -125,7 +129,7 @@ async def check_income_order_4(callback: CallbackQuery, state: FSMContext):
     #     await callback.message.answer('*Нельзя отправить заказ в архив, т.к не все поставки приняты на складе WB*', parse_mode='Markdown')
     # else:
     await state.set_state(check_orders.close_order)
-    await callback.message.answer(f'*Не отправлено S:* _{data["remain_s"]}_ *M:* _{data["remain_m"]}_ *L:* _{data["remain_l"]}_\n'
+    await callback.message.answer(f'*Не отправлено XS:* _{data["remain_xs"]}_ S:* _{data["remain_s"]}_ *M:* _{data["remain_m"]}_ *L:* _{data["remain_l"]}_\n'
                                       f'*Вы уверены, что хотите отправить заказ в архив?*', reply_markup=static_kb.close_order, parse_mode='Markdown')
 
 

@@ -26,6 +26,7 @@ async def all_orders():
             if order.flag:
                 text += '🚩'
             text += (f'АРТ: {order.internal_article} '
+                     f'XS: {order.quantity_xs} '
                      f'S: {order.quantity_s} '
                      f'M: {order.quantity_m} '
                      f'L: {order.quantity_l}')
@@ -44,6 +45,7 @@ async def recipient_orders():
             if order.flag:
                 text += '🚩'
             text += (f'АРТ: {order.internal_article} '
+                     f'XS: {order.quantity_xs} '
                      f'S: {order.quantity_s} '
                      f'M: {order.quantity_m} '
                      f'L: {order.quantity_l}')
@@ -60,6 +62,7 @@ async def archive_orders():
         if await half_year_check(order.create_date) and order.status == 'Заказ готов':
             keyboard.add(InlineKeyboardButton(
                 text=f'АРТ: {order.internal_article} '
+                     f'XS: {order.quantity_xs} '
                      f'S: {order.quantity_s} '
                      f'M: {order.quantity_m} '
                      f'L: {order.quantity_l}',
@@ -71,7 +74,9 @@ async def order_shipments(order_id):
     keyboard = InlineKeyboardBuilder()
     shipments = await ship_rq.get_shipments(order_id)
     for shipment in shipments:
-        keyboard.add(InlineKeyboardButton(text=f'S: {shipment.quantity_s} '
+        keyboard.add(InlineKeyboardButton(text=
+                     f'XS: {shipment.quantity_xs} '
+                     f'S: {shipment.quantity_s} '
                      f'M: {shipment.quantity_m} '
                      f'L: {shipment.quantity_l}', callback_data=f'shipment_id_{shipment.id}'))
     return keyboard.adjust(1).as_markup()
@@ -84,6 +89,7 @@ async def change_status_shipments():
         if shipment.status != 'Принята на складе WB':
             order = await order_rq.get_order(shipment.order_id)
             keyboard.add(InlineKeyboardButton(text=f'Цвет: {order.color} '
+                         f'XS: {shipment.quantity_xs} '
                          f'S: {shipment.quantity_s} '
                          f'M: {shipment.quantity_m} '
                          f'L: {shipment.quantity_l}', callback_data=f'shipment_id_{shipment.id}'))
@@ -111,7 +117,7 @@ async def fire_cheques():
     cheques = await cheque_rq.get_fire_cheques()
     for cheque in cheques:
         shipment = await ship_rq.get_shipment(cheque.shipment_id)
-        keyboard.add(InlineKeyboardButton(text=f'Цена: {cheque.price}$ S: {shipment.quantity_s} M: {shipment.quantity_m}'
+        keyboard.add(InlineKeyboardButton(text=f'Цена: {cheque.price}$ XS: {shipment.quantity_xs} S: {shipment.quantity_s} M: {shipment.quantity_m}'
                                                f' L: {shipment.quantity_l}',
                                           callback_data=f'cheque_id_{cheque.id}'))
     return keyboard.adjust(1).as_markup()
@@ -122,7 +128,7 @@ async def delay_cheques():
     cheques = await cheque_rq.get_delay_cheques()
     for cheque in cheques:
         shipment = await ship_rq.get_shipment(cheque.shipment_id)
-        keyboard.add(InlineKeyboardButton(text=f'Цена: {cheque.price}$ S: {shipment.quantity_s} M: {shipment.quantity_m}'
+        keyboard.add(InlineKeyboardButton(text=f'Цена: {cheque.price}$ XS: {shipment.quantity_xs} S: {shipment.quantity_s} M: {shipment.quantity_m}'
                                                f' L: {shipment.quantity_l}',
                                           callback_data=f'cheque_id_{cheque.id}'))
     return keyboard.adjust(1).as_markup()
@@ -133,7 +139,7 @@ async def paid_cheques():
     cheques = await cheque_rq.get_paid_cheques()
     for cheque in cheques:
         shipment = await ship_rq.get_shipment(cheque.shipment_id)
-        keyboard.add(InlineKeyboardButton(text=f'Цена: {cheque.price}$ S: {shipment.quantity_s} M: {shipment.quantity_m}'
+        keyboard.add(InlineKeyboardButton(text=f'Цена: {cheque.price}$ XS: {shipment.quantity_xs} S: {shipment.quantity_s} M: {shipment.quantity_m}'
                                                f' L: {shipment.quantity_l}',
                                           callback_data=f'paid_cheque_id_{cheque.id}'))
     return keyboard.adjust(1).as_markup()
@@ -161,6 +167,7 @@ async def all_shipments():
             date = datetime.strptime(shipment.create_date, '%d-%m-%Y %H:%M:%S')
             str_date = datetime.strftime(date, '%d-%m-%Y')
             keyboard.add(InlineKeyboardButton(text=f'Дата {str_date} '
+                                                   f'XS: {shipment.quantity_xs} '
                                                    f'S: {shipment.quantity_s} '
                                                    f'M: {shipment.quantity_m} '
                                                    f'L: {shipment.quantity_l}',
@@ -174,7 +181,7 @@ async def all_cheques():
     for cheque in cheques:
         shipment = await ship_rq.get_shipment(cheque.shipment_id)
         if await half_year_check(cheque.date) and cheque.cheque_status != 'Чек оплачен':
-            keyboard.add(InlineKeyboardButton(text=f'Цена: {cheque.price}$ S: {shipment.quantity_s} M: {shipment.quantity_m}'
+            keyboard.add(InlineKeyboardButton(text=f'Цена: {cheque.price}$ XS: {shipment.quantity_xs} S: {shipment.quantity_s} M: {shipment.quantity_m}'
                                                    f' L: {shipment.quantity_l}',
                                               callback_data=f'cheque_id_{cheque.id}'))
     return keyboard.adjust(1).as_markup()
@@ -188,7 +195,7 @@ async def all_fishes():
         if await half_year_check(fish.fish_date) and shipment.status != 'Принята на складе WB':
             date = datetime.strptime(fish.fish_date, '%d-%m-%Y %H:%M:%S')
             str_date = datetime.strftime(date, '%d-%m-%Y')
-            keyboard.add(InlineKeyboardButton(text=f'Дата {str_date} S: {shipment.quantity_s} M: {shipment.quantity_m}'
+            keyboard.add(InlineKeyboardButton(text=f'Дата {str_date} XS: {shipment.quantity_xs} S: {shipment.quantity_s} M: {shipment.quantity_m}'
                                                    f' L: {shipment.quantity_l}',
                                               callback_data=f'fish_id_{fish.id}'))
     return keyboard.adjust(1).as_markup()
