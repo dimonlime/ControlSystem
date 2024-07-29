@@ -11,7 +11,7 @@ from app.database.requests import fish_request as fish_rq
 from app.database.requests import shipment_request as ship_rq
 from app.database.requests import product_card_request as card_rq
 from app.utils.utils import product_card_exists, enough_quantity_order, shipments_quantity_s, shipments_quantity_m, \
-    shipments_quantity_l
+    shipments_quantity_l, shipments_quantity_xs
 
 from app.states.shipment import create_shipment_state, create_cheque_state, create_fish_state
 
@@ -32,9 +32,11 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
     await state.update_data(order_id=order_id)
     order = await order_rq.get_order(order_id)
     await state.update_data(order=order)
+    ship_xs = await shipments_quantity_xs(order_id)
     ship_s = await shipments_quantity_s(order_id)
     ship_m = await shipments_quantity_m(order_id)
     ship_l = await shipments_quantity_l(order_id)
+    remain_xs = order.quantity_xs - ship_xs
     remain_s = order.quantity_s - ship_s
     remain_m = order.quantity_m - ship_m
     remain_l = order.quantity_l - ship_l
@@ -42,13 +44,13 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
     media_list = [InputMediaPhoto(media=FSInputFile(path=order.order_image),
                                   caption=f'*Артикул:* _{order.internal_article}_\n'
                                           f'*Дата создания заказа:* _{datetime.strftime(order_create_date, "%d-%m-%Y %H:%M")}_\n'
-                                          f'*S:* _{order.quantity_s} _*M:* _{order.quantity_m}_ *L:* _{order.quantity_l}_\n'
+                                          f'*XS:* _{order.quantity_xs} *S:* _{order.quantity_s} _*M:* _{order.quantity_m}_ *L:* _{order.quantity_l}_\n'
                                           f'*Цвет:* _{order.color}_\n'
                                           f'*Название магазина:* _{order.shop_name}_\n'
                                           f'*Способ отправки:* _{order.sending_method}_\n'
                                           f'------------------------------\n'
-                                          f'*Вы отправили:* *S:* _{ship_s}_ *M:* _{ship_m}_ *L:* _{ship_l}_\n'
-                                          f'*Осталось отправить:* *S:* _{remain_s}_ *M:* _{remain_m}_ *L:* _{remain_l}_\n',
+                                          f'*Вы отправили:* *XS:* _{ship_xs}_ *S:* _{ship_s}_ *M:* _{ship_m}_ *L:* _{ship_l}_\n'
+                                          f'*Осталось отправить:* *XS:* _{remain_xs}_ *S:* _{remain_s}_ *M:* _{remain_m}_ *L:* _{remain_l}_\n',
                                   parse_mode="Markdown")]
     await callback.message.answer_media_group(media=media_list)
     await callback.message.answer(f'Выберите действие', reply_markup=static_kb.recipient_order)
@@ -142,7 +144,7 @@ async def create_shipment(message: Message, state: FSMContext):
                                               caption=f'🔴*Оповещение о создании поставки*🔴\n'
                                                       f"*Артикул:* _{data['order'].internal_article}_\n"
                                                       f"*Дата создания поставки:* _{data['shipment'].create_date}_\n"
-                                                      f"*Кол-во товара* *S:* _{data['shipment'].quantity_s}_ *M:* _{data['shipment'].quantity_m}_ *L:* _{data['shipment'].quantity_l}_\n",
+                                                      f"*Кол-во товара* *XS:* _{data['shipment'].quantity_xs}_ *S:* _{data['shipment'].quantity_s}_ *M:* _{data['shipment'].quantity_m}_ *L:* _{data['shipment'].quantity_l}_\n",
                                               parse_mode="Markdown"),
                               InputMediaPhoto(media=FSInputFile(path=data['fish'].fish_image_id)),
                               InputMediaPhoto(media=FSInputFile(path=data['cheque'].cheque_image_id))]
