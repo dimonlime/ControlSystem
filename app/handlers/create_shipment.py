@@ -10,6 +10,7 @@ from app.database.requests import cheque_request as cheque_rq
 from app.database.requests import fish_request as fish_rq
 from app.database.requests import shipment_request as ship_rq
 from app.database.requests import product_card_request as card_rq
+from app.database.requests import logist_warehouse_request
 from app.utils.utils import product_card_exists, enough_quantity_order, shipments_quantity_s, shipments_quantity_m, \
     shipments_quantity_l, shipments_quantity_xs
 
@@ -44,7 +45,7 @@ async def check_income_order(callback: CallbackQuery, state: FSMContext):
     media_list = [InputMediaPhoto(media=FSInputFile(path=order.order_image),
                                   caption=f'*Артикул:* _{order.internal_article}_\n'
                                           f'*Дата создания заказа:* _{datetime.strftime(order_create_date, "%d-%m-%Y %H:%M")}_\n'
-                                          f'*XS:* _{order.quantity_xs} *S:* _{order.quantity_s} _*M:* _{order.quantity_m}_ *L:* _{order.quantity_l}_\n'
+                                          f'*XS:* _{order.quantity_xs}_ *S:* _{order.quantity_s} _*M:* _{order.quantity_m}_ *L:* _{order.quantity_l}_\n'
                                           f'*Цвет:* _{order.color}_\n'
                                           f'*Название магазина:* _{order.shop_name}_\n'
                                           f'*Способ отправки:* _{order.sending_method}_\n'
@@ -149,6 +150,21 @@ async def create_shipment(message: Message, state: FSMContext):
                               InputMediaPhoto(media=FSInputFile(path=data['fish'].fish_image_id)),
                               InputMediaPhoto(media=FSInputFile(path=data['cheque'].cheque_image_id))]
                 await message.bot.send_media_group(media=media_list, chat_id=chat_id)
+
+        data = await state.get_data()
+        logists = await logist_warehouse_request.get_logist_warehouse()
+        flag = False
+        for logist in logists:
+            if logist.article == data['order'].internal_article:
+                await logist_warehouse_request.add_logist_warehouse_db(logist.id, data['shipment'].quantity_xs,
+                                                                       data['shipment'].quantity_s, data['shipment'].quantity_m,
+                                                                       data['shipment'].quantity_l)
+                flag = True
+        if not flag:
+            await logist_warehouse_request.create_logist_warehouse_db(data['order'].internal_article, data['shipment'].quantity_xs,
+                                                                      data['shipment'].quantity_s, data['shipment'].quantity_m,
+                                                                      data['shipment'].quantity_l)
+
         await state.clear()
     except ValueError:
         await message.answer('Ошибка, попробуйте еще раз')

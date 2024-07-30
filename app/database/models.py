@@ -53,6 +53,7 @@ class Shipment(Base):
     document_2_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
     image_1_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
     image_2_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
+    warehouse: Mapped[str] = mapped_column(String(255), nullable=True, default='Склад логистов')
 
 
 class Cheque(Base):
@@ -95,6 +96,77 @@ class ProductCard(Base):
     color: Mapped[str] = mapped_column(String(50))
     shop_name: Mapped[str] = mapped_column(String(25))
     vendor_internal_article: Mapped[str] = mapped_column(String(50), nullable=True, default='Не заполнено')
+
+
+class LogistWarehouse(Base):
+    __tablename__ = 'logist_warehouse'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    article: Mapped[str] = mapped_column(String(255))
+    quantity_xs: Mapped[int] = mapped_column()
+    quantity_s: Mapped[int] = mapped_column()
+    quantity_m: Mapped[int] = mapped_column()
+    quantity_l: Mapped[int] = mapped_column()
+
+
+class FullfilmenttWarehouse(Base):
+    __tablename__ = 'fullfilment_warehouse'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    article: Mapped[str] = mapped_column(String(255))
+    quantity_xs: Mapped[int] = mapped_column()
+    quantity_s: Mapped[int] = mapped_column()
+    quantity_m: Mapped[int] = mapped_column()
+    quantity_l: Mapped[int] = mapped_column()
+
+
+class WildberriesWarehouse(Base):
+    __tablename__ = 'wildberries_warehouse'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    article: Mapped[str] = mapped_column(String(255))
+    quantity_xs: Mapped[int] = mapped_column()
+    quantity_s: Mapped[int] = mapped_column()
+    quantity_m: Mapped[int] = mapped_column()
+    quantity_l: Mapped[int] = mapped_column()
+
+
+class OzonWarehouse(Base):
+    __tablename__ = 'ozon_warehouse'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    article: Mapped[str] = mapped_column(String(255))
+    quantity_xs: Mapped[int] = mapped_column()
+    quantity_s: Mapped[int] = mapped_column()
+    quantity_m: Mapped[int] = mapped_column()
+    quantity_l: Mapped[int] = mapped_column()
+
+
+class YandexWarehouse(Base):
+    __tablename__ = 'yandex_warehouse'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    article: Mapped[str] = mapped_column(String(255))
+    quantity_xs: Mapped[int] = mapped_column()
+    quantity_s: Mapped[int] = mapped_column()
+    quantity_m: Mapped[int] = mapped_column()
+    quantity_l: Mapped[int] = mapped_column()
+
+
+class MovementHistory(Base):
+    __tablename__ = 'movement_history'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    start: Mapped[str] = mapped_column(String(255))
+    destination: Mapped[str] = mapped_column(String(255))
+    quantity_xs: Mapped[int] = mapped_column()
+    quantity_s: Mapped[int] = mapped_column()
+    quantity_m: Mapped[int] = mapped_column()
+    quantity_l: Mapped[int] = mapped_column()
+    file: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
+    comment: Mapped[str] = mapped_column(String(255), nullable=True)
+
+
 
 
 async def async_main():
