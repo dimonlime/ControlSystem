@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 from sqlalchemy import String, ForeignKey, Null, Text, Column
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
@@ -157,6 +158,8 @@ class MovementHistory(Base):
     __tablename__ = 'movement_history'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    article: Mapped[str] = mapped_column(String(255))
+    time: Mapped[str] = mapped_column(String(255))
     start: Mapped[str] = mapped_column(String(255))
     destination: Mapped[str] = mapped_column(String(255))
     quantity_xs: Mapped[int] = mapped_column()
@@ -172,3 +175,4 @@ class MovementHistory(Base):
 async def async_main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all) 
+
