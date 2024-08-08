@@ -54,7 +54,6 @@ class Shipment(Base):
     document_2_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
     image_1_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
     image_2_id: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
-    warehouse: Mapped[str] = mapped_column(String(255), nullable=True, default='Склад логистов')
 
 
 class Cheque(Base):

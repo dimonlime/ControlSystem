@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="a8fc9575-9242-487e-b97a-49ab9bbf0b74" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/app/database/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/database/models.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2emfgcUEQoynLz9zbgua8wwikSy" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.run.executor&quot;: &quot;Run&quot;,
+    &quot;Python.run.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python.run2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.run_odds.executor&quot;: &quot;Run&quot;,
+    &quot;Python.vendor_handler.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/samar/PycharmProjects/Nadziratel_Bot/odds/run_odds.py&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlite&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\samar\PycharmProjects\Nadziratel_Bot" />
+      <recent name="C:\Users\samar\PycharmProjects\Nadziratel_Bot\app" />
+      <recent name="C:\Users\samar\PycharmProjects\Nadziratel_Bot\control_system" />
+      <recent name="C:\Users\samar\PycharmProjects\Nadziratel_Bot\odds" />
+      <recent name="C:\Users\samar\PycharmProjects\Nadziratel_Bot\app\database\requests" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.run.py">
+    <configuration name="run_odds" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="Nadziratel_Bot" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12 (Nadziratel_Bot)" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/odds/run_odds.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="run.py" type="PythonConfigurationType" factoryName="Python">
+      <module name="Nadziratel_Bot" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12 (Nadziratel_Bot)" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/run.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.run_odds" />
+      <item itemvalue="Python.run.py" />
+    </list>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-50da183f06c8-2887949eec09-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.13135.95" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a8fc9575-9242-487e-b97a-49ab9bbf0b74" name="Changes" comment="" />
+      <created>1712514785840</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1712514785840</updated>
+      <workItem from="1712514792429" duration="2311000" />
+      <workItem from="1712534323794" duration="17000" />
+      <workItem from="1712574576515" duration="3518000" />
+      <workItem from="1712581287536" duration="645000" />
+      <workItem from="1712583222641" duration="1942000" />
+      <workItem from="1712585399727" duration="66000" />
+      <workItem from="1712585522877" duration="487000" />
+      <workItem from="1712586023047" duration="550000" />
+      <workItem from="1712586588285" duration="6051000" />
+      <workItem from="1712770550070" duration="9003000" />
+      <workItem from="1712842202037" duration="17639000" />
+      <workItem from="1712914943802" duration="16648000" />
+      <workItem from="1713027124768" duration="1108000" />
+      <workItem from="1713085846335" duration="1147000" />
+      <workItem from="1713131214647" duration="10837000" />
+      <workItem from="1713181387440" duration="5370000" />
+      <workItem from="1713193320169" duration="9283000" />
+      <workItem from="1713271681353" duration="11197000" />
+      <workItem from="1713384956610" duration="1295000" />
+      <workItem from="1713432172776" duration="10920000" />
+      <workItem from="1713456903696" duration="19339000" />
+      <workItem from="1713516506410" duration="15840000" />
+      <workItem from="1713543396292" duration="3891000" />
+      <workItem from="1713618662483" duration="4400000" />
+      <workItem from="1713729026892" duration="2233000" />
+      <workItem from="1713735217896" duration="59000" />
+      <workItem from="1713768296187" duration="28972000" />
+      <workItem from="1713806122062" duration="24000" />
+      <workItem from="1713806623343" duration="600000" />
+      <workItem from="1713807995101" duration="5000" />
+      <workItem from="1713808461053" duration="15000" />
+      <workItem from="1713808557136" duration="9000" />
+      <workItem from="1713817710172" duration="4000" />
+      <workItem from="1713818327100" duration="4515000" />
+      <workItem from="1713860344957" duration="13724000" />
+      <workItem from="1713967819312" duration="830000" />
+      <workItem from="1713979546231" duration="6638000" />
+      <workItem from="1713989315093" duration="904000" />
+      <workItem from="1713990361619" duration="795000" />
+      <workItem from="1713991195531" duration="1041000" />
+      <workItem from="1713992553316" duration="25000" />
+      <workItem from="1714038584906" duration="59000" />
+      <workItem from="1714377626578" duration="675000" />
+      <workItem from="1714410552651" duration="20000" />
+      <workItem from="1714725274151" duration="7181000" />
+      <workItem from="1714991297194" duration="13000" />
+      <workItem from="1714991371098" duration="17000" />
+      <workItem from="1715100703532" duration="5139000" />
+      <workItem from="1715156177664" duration="25000" />
+      <workItem from="1715158267624" duration="739000" />
+      <workItem from="1715172197345" duration="6626000" />
+      <workItem from="1715186637154" duration="2813000" />
+      <workItem from="1715206683612" duration="5203000" />
+      <workItem from="1715244071050" duration="1237000" />
+      <workItem from="1715282138476" duration="10027000" />
+      <workItem from="1715331767981" duration="7209000" />
+      <workItem from="1715357555139" duration="5791000" />
+      <workItem from="1715442452781" duration="163000" />
+      <workItem from="1715681999854" duration="7631000" />
+      <workItem from="1715709070994" duration="6608000" />
+      <workItem from="1715776807586" duration="8478000" />
+      <workItem from="1715885279384" duration="16622000" />
+      <workItem from="1715935821502" duration="10722000" />
+      <workItem from="1716120554414" duration="608000" />
+      <workItem from="1716202531591" duration="10540000" />
+      <workItem from="1716232073710" duration="11000" />
+      <workItem from="1716232391022" duration="2109000" />
+      <workItem from="1716295349210" duration="2983000" />
+      <workItem from="1716387141268" duration="5033000" />
+      <workItem from="1716470882250" duration="2644000" />
+      <workItem from="1716483236599" duration="12154000" />
+      <workItem from="1716544656313" duration="21258000" />
+      <workItem from="1716823723936" duration="14844000" />
+      <workItem from="1716890842251" duration="687000" />
+      <workItem from="1716936140081" duration="19678000" />
+      <workItem from="1716982874677" duration="7996000" />
+      <workItem from="1717001982629" duration="1202000" />
+      <workItem from="1717162060899" duration="12729000" />
+      <workItem from="1717247279988" duration="1169000" />
+      <workItem from="1717534730677" duration="4869000" />
+      <workItem from="1717594866817" duration="10515000" />
+      <workItem from="1717769165894" duration="37000" />
+      <workItem from="1717769962100" duration="9825000" />
+      <workItem from="1717958559224" duration="1272000" />
+      <workItem from="1718042472385" duration="866000" />
+      <workItem from="1718188910822" duration="202000" />
+      <workItem from="1718190141835" duration="1552000" />
+      <workItem from="1718193374760" duration="607000" />
+      <workItem from="1718365024274" duration="338000" />
+      <workItem from="1718625479729" duration="19000" />
+      <workItem from="1718749770439" duration="2982000" />
+      <workItem from="1718794421755" duration="1232000" />
+      <workItem from="1718882170112" duration="1496000" />
+      <workItem from="1718985644939" duration="4545000" />
+      <workItem from="1719051862924" duration="2053000" />
+      <workItem from="1719170402762" duration="4378000" />
+      <workItem from="1719232667541" duration="271000" />
+      <workItem from="1719233182639" duration="9881000" />
+      <workItem from="1719257267308" duration="44000" />
+      <workItem from="1719257759407" duration="645000" />
+      <workItem from="1719499460794" duration="95000" />
+      <workItem from="1719570080756" duration="16000" />
+      <workItem from="1719946239452" duration="921000" />
+      <workItem from="1720712449178" duration="1409000" />
+      <workItem from="1720717999477" duration="3556000" />
+      <workItem from="1720769970983" duration="12000" />
+      <workItem from="1720875069167" duration="11512000" />
+      <workItem from="1720958682194" duration="909000" />
+      <workItem from="1721046917279" duration="1248000" />
+      <workItem from="1721089342770" duration="1815000" />
+      <workItem from="1721156958915" duration="1089000" />
+      <workItem from="1721176262305" duration="38000" />
+      <workItem from="1721381261206" duration="355000" />
+      <workItem from="1721381624389" duration="34000" />
+      <workItem from="1721395000447" duration="1906000" />
+      <workItem from="1721400365854" duration="827000" />
+      <workItem from="1721580776371" duration="623000" />
+      <workItem from="1721776325455" duration="135000" />
+      <workItem from="1721777365148" duration="252000" />
+      <workItem from="1721925653605" duration="1439000" />
+      <workItem from="1721948164099" duration="600000" />
+      <workItem from="1721983818965" duration="4005000" />
+      <workItem from="1722014380228" duration="3000" />
+      <workItem from="1722014787876" duration="22000" />
+      <workItem from="1722213061727" duration="217000" />
+      <workItem from="1722258547515" duration="4751000" />
+      <workItem from="1722302592525" duration="1478000" />
+      <workItem from="1722334411643" duration="8723000" />
+      <workItem from="1722854189955" duration="604000" />
+      <workItem from="1722949378466" duration="728000" />
+      <workItem from="1722980915659" duration="4000" />
+      <workItem from="1723015110525" duration="33000" />
+      <workItem from="1723018379760" duration="2447000" />
+      <workItem from="1723054416190" duration="2648000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="order_data" />
+        <watch expression="keyboard" />
+        <watch expression="keyboard" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Nadziratel_Bot$run_odds.coverage" NAME="run_odds Coverage Results" MODIFIED="1720712452962" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Nadziratel_Bot$run2.coverage" NAME="run2 Coverage Results" MODIFIED="1719239795976" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Nadziratel_Bot$run_py.coverage" NAME="run.py Coverage Results" MODIFIED="1723020481319" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Nadziratel_Bot$vendor_handler.coverage" NAME="vendor_handler Coverage Results" MODIFIED="1712586237186" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/handlers/vendor_handler" />
+    <SUITE FILE_PATH="coverage/Nadziratel_Bot$run.coverage" NAME="run Coverage Results" MODIFIED="1712586555134" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>
